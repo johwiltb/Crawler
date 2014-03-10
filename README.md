@@ -14,8 +14,9 @@ user.
 JRE -> JavaSE-1.7
 IDE -> Eclipse Kepler
 File list:
-./
+
     src/
+    
         README.txt
         Crawler.java
         UserMenu.java
