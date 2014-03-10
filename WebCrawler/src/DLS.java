@@ -9,9 +9,13 @@
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class DLS {
 	private int strMatchAlg; 						// Integer representing the chosen string matching algorithm
@@ -40,20 +44,27 @@ public class DLS {
 	 */
 	public void search() {
 		if (this.isSearching()) {
-			URL urlSearch = null;
+			URLConnection con = null;
+			InputStream ins = null;
+			InputStreamReader isr = null;
 			try {
-				urlSearch = new URL(getUrl());
+				URL urlSearch = new URL(getUrl());
+				if (getUrl().matches("^https")) {
+					con = (HttpsURLConnection)urlSearch.openConnection();
+				} else {
+					con = urlSearch.openConnection();
+				}
+				ins = con.getInputStream();
+			    isr = new InputStreamReader(ins);
 			} catch (MalformedURLException e1) {
 				System.out.println("Unable to connect to URL!");
 				e1.printStackTrace();
+			} catch (IOException e) {
+				System.out.println("Unable to open https connection");
+				e.printStackTrace();
 			}
 	    	BufferedReader br = null;
-			try {
-				br = new BufferedReader(new InputStreamReader(urlSearch.openStream()));
-			} catch (IOException e1) {
-				System.out.println("Unable to open URL website");
-				e1.printStackTrace();
-			}
+			br = new BufferedReader(isr);
 	    	String tmpLine = " ";
 			// Pull the first domain, and search content.
 			
