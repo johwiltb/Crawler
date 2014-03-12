@@ -26,7 +26,7 @@ public class ConsoleCrawler {
 		System.out.print("Choose you String Matching Algorithm\n(1): Longest Common Sequence\n(2): Naive String Matching"
 				+ "\n(3): Rabin-Karp\n(4): Finite Automata\n(5): KMP\nChoice: ");
 		stringType = input.nextInt();
-		while(stringType < 1 || stringType > 5) {
+		while((stringType < 1 || stringType > 5) && !(stringType == 100)) {
 			System.out.print("Invalid response. Please choose '1-5': ");
 			stringType = input.nextInt();
 		}

@@ -15,8 +15,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.UnknownHostException;
-
 import javax.net.ssl.HttpsURLConnection;
 
 public class BFS {
@@ -152,6 +150,24 @@ public class BFS {
 							KMP kmp = new KMP(this.getqText(), tmpLine);
 							// for testing
 							kmp.test();
+							String pat;
+							//pat = nss.giveString();
+							//System.out.println(pat);
+						}
+					} catch (MalformedURLException e) {
+						System.out.println("Unable to open URL!");
+						System.exit(1);
+					} catch (IOException e) {
+						
+					}
+					break;
+				// Horrible Test Case, must get rid of later
+				case(99):
+					try {
+						while(tmpLine != null && this.isSearching()) {
+							tmpLine = br.readLine();
+							JohnsMatching jms = new JohnsMatching(this.getqText(), tmpLine);
+							// for testing
 							String pat;
 							//pat = nss.giveString();
 							//System.out.println(pat);
