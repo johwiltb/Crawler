@@ -7,16 +7,19 @@
 public class JohnsMatching {
 	private String qText, fLine;
 	
-	public JohnsMatching(String query, String fullline) {
+	public JohnsMatching(String query, String fullLine) {
 		this.qText = query;
-		this.fLine = fullline;
+		this.fLine = fullLine;
 		match();
 		
 	}
 
 	private void match() {
-		System.out.println("Here's your test!");
-		
+		//if (this.fLine.matches("<a\b([^>]+)>(.+?)</a>"))
+		if (fLine.matches("^.*<[a,LINK].*href=.*")){
+			System.out.println(this.fLine);
+		}
+		//if (fLine.matches("^.*src="))
 	}
 
 }

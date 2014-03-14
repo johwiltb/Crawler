@@ -76,12 +76,12 @@ public class DLS {
 					try {
 						while(tmpLine != null && this.isSearching()) {
 							tmpLine = br.readLine();
-							LCS lcs = new LCS(this.getqText(), tmpLine);
+							LCS lcs = new LCS();
 							// for testing
 							String pat;
-							lcs.test();
+							pat = lcs.match(this.getqText(), tmpLine);
 							//pat = nss.giveString();
-							//System.out.println(pat);
+							System.out.println(pat);
 						}
 					} catch (MalformedURLException e) {
 						System.out.println("Unable to open URL!");
@@ -166,8 +166,7 @@ public class DLS {
 				// Horrible Test Case, must get rid of later
 				case(99):
 					try {
-						while(tmpLine != null && this.isSearching()) {
-							tmpLine = br.readLine();
+						while((tmpLine = br.readLine()) != null && this.isSearching()) {
 							JohnsMatching jms = new JohnsMatching(this.getqText(), tmpLine);
 							// for testing
 							String pat;

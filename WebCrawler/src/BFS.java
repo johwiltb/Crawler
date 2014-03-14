@@ -72,14 +72,13 @@ public class BFS {
 			switch(this.getStrMatchAlg()) {
 				case(0):
 					try {
-						while(tmpLine != null && this.isSearching()) {
-							tmpLine = br.readLine();
-							LCS lcs = new LCS(this.getqText(), tmpLine);
+						while((tmpLine = br.readLine()) != null && this.isSearching()) {
+							LCS lcs = new LCS();
 							// for testing
 							String pat;
-							lcs.test();
+							pat = lcs.match(this.getqText(), tmpLine);
 							//pat = nss.giveString();
-							//System.out.println(pat);
+							System.out.println(pat);
 						}
 					} catch (MalformedURLException e) {
 						System.out.println("Unable to open URL!");
@@ -90,8 +89,7 @@ public class BFS {
 					break;
 				case(1):
 					try {
-						while(tmpLine != null && this.isSearching()) {
-							tmpLine = br.readLine();
+						while((tmpLine = br.readLine()) != null && this.isSearching()) {
 							NaiveString nss = new NaiveString(this.getqText(), tmpLine);
 							// for testing
 							nss.test();
@@ -108,8 +106,7 @@ public class BFS {
 					break;
 				case(2):
 					try {
-						while(tmpLine != null && this.isSearching()) {
-							tmpLine = br.readLine();
+						while((tmpLine = br.readLine()) != null && this.isSearching()) {
 							RabinKarp rks = new RabinKarp(this.getqText(), tmpLine);
 							// for testing
 							rks.test();
@@ -127,8 +124,7 @@ public class BFS {
 					break;
 				case(3):
 					try {
-						while(tmpLine != null && this.isSearching()) {
-							tmpLine = br.readLine();
+						while((tmpLine = br.readLine()) != null && this.isSearching()) {
 							FiniteAutomata fas = new FiniteAutomata(this.getqText(), tmpLine);
 							// for testing
 							fas.test();
@@ -145,8 +141,7 @@ public class BFS {
 					break;
 				case(4):
 					try {
-						while(tmpLine != null && this.isSearching()) {
-							tmpLine = br.readLine();
+						while((tmpLine = br.readLine()) != null && this.isSearching()) {
 							KMP kmp = new KMP(this.getqText(), tmpLine);
 							// for testing
 							kmp.test();
@@ -164,8 +159,7 @@ public class BFS {
 				// Horrible Test Case, must get rid of later
 				case(99):
 					try {
-						while(tmpLine != null && this.isSearching()) {
-							tmpLine = br.readLine();
+						while((tmpLine = br.readLine()) != null && this.isSearching()) {
 							JohnsMatching jms = new JohnsMatching(this.getqText(), tmpLine);
 							// for testing
 							String pat;
