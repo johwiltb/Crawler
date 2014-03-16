@@ -70,6 +70,8 @@ public class BFS {
 			
 			// Use string matching algorithm here to match query text
 			switch(this.getStrMatchAlg()) {
+			
+				// Longest Common Sequence
 				case(0):
 					try {
 						while((tmpLine = br.readLine()) != null && this.isSearching()) {
@@ -87,6 +89,8 @@ public class BFS {
 						
 					}
 					break;
+					
+				// Naive String Matching
 				case(1):
 					try {
 						while((tmpLine = br.readLine()) != null && this.isSearching()) {
@@ -104,6 +108,8 @@ public class BFS {
 						
 					}
 					break;
+					
+				// Rabin-Karp String Matching
 				case(2):
 					try {
 						while((tmpLine = br.readLine()) != null && this.isSearching()) {
@@ -122,6 +128,8 @@ public class BFS {
 						
 					}
 					break;
+					
+				// Finite Automata String Matching
 				case(3):
 					try {
 						while((tmpLine = br.readLine()) != null && this.isSearching()) {
@@ -139,6 +147,8 @@ public class BFS {
 						
 					}
 					break;
+				
+				// Knuth-Morris-Pratt String Matching
 				case(4):
 					try {
 						while((tmpLine = br.readLine()) != null && this.isSearching()) {
@@ -156,35 +166,12 @@ public class BFS {
 						
 					}
 					break;
-				// Horrible Test Case, must get rid of later
-				case(99):
-					try {
-						while((tmpLine = br.readLine()) != null && this.isSearching()) {
-							JohnsMatching jms = new JohnsMatching(this.getqText(), tmpLine);
-							// for testing
-							String pat;
-							//pat = nss.giveString();
-							//System.out.println(pat);
-						}
-					} catch (MalformedURLException e) {
-						System.out.println("Unable to open URL!");
-						System.exit(1);
-					} catch (IOException e) {
-						
-					}
-					break;
+				
+				// Default Case
 				default:
 					System.out.println("Invalid String Matching Algorithm selected!");
 					System.exit(1);
 			}
-			// Build list of children from either 'href=' or 'src='
-			
-			// traverse in breadth-first order and recursively call the method
-			// This method will have variables to determine whether to move to
-			// a child or sibling
-			
-			// End the searching
-			//this.setSearching(false);
 		}
 	}
 

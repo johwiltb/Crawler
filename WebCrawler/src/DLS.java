@@ -44,9 +44,12 @@ public class DLS {
 	 */
 	public void search() {
 		if (this.isSearching()) {
+			int numOfSites = 0;								// Variable to track how deep the search has gone
 			URLConnection con = null;
 			InputStream ins = null;
 			InputStreamReader isr = null;
+			
+			// Attempt to connect to the site, and match both HTTP and HTTPS
 			try {
 				URL urlSearch = new URL(getUrl());
 				if (getUrl().matches("^https")) {
@@ -54,6 +57,7 @@ public class DLS {
 				} else {
 					con = urlSearch.openConnection();
 				}
+				
 				// Hehe, look like a real web browser
 				con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0");
 				ins = con.getInputStream();
@@ -67,131 +71,134 @@ public class DLS {
 			}
 	    	BufferedReader br = null;
 			br = new BufferedReader(isr);
-	    	String tmpLine = " ";
-			// Pull the first domain, and search content.
+	    	String tmpLine = " ";			// Set for a space so it matches initial readLine
 			
 			// Use string matching algorithm here to match query text
 			switch(this.getStrMatchAlg()) {
+			
+				// Longest Common Sequence
 				case(0):
-					try {
-						while(tmpLine != null && this.isSearching()) {
-							tmpLine = br.readLine();
-							LCS lcs = new LCS();
-							// for testing
-							String pat;
-							pat = lcs.match(this.getqText(), tmpLine);
-							//pat = nss.giveString();
-							System.out.println(pat);
+					while(numOfSites < MAX_SEARCH_DEPTH) {
+						try {
+							while(tmpLine != null && this.isSearching()) {
+								tmpLine = br.readLine();
+								LCS lcs = new LCS();
+								// for testing
+								String pat;
+								pat = lcs.match(this.getqText(), tmpLine);
+								//pat = nss.giveString();
+								if (pat != null)
+									System.out.println(tmpLine);
+								numOfSites++;
+							}
+						} catch (MalformedURLException e) {
+							System.out.println("Unable to open URL!");
+							System.exit(1);
+						} catch (IOException e) {
+							
 						}
-					} catch (MalformedURLException e) {
-						System.out.println("Unable to open URL!");
-						System.exit(1);
-					} catch (IOException e) {
-						
 					}
+					numOfSites++;	
 					break;
+					
+				// Naive String Matching
 				case(1):
-					try {
-						while(tmpLine != null && this.isSearching()) {
-							tmpLine = br.readLine();
-							NaiveString nss = new NaiveString(this.getqText(), tmpLine);
-							// for testing
-							nss.test();
-							String pat;
-							//pat = nss.giveString();
-							//System.out.println(pat);
+					while(numOfSites < MAX_SEARCH_DEPTH) {
+						try {
+							while(tmpLine != null && this.isSearching()) {
+								tmpLine = br.readLine();
+								NaiveString nss = new NaiveString(this.getqText(), tmpLine);
+								// for testing
+								nss.test();
+								String pat;
+								//pat = nss.giveString();
+								//System.out.println(pat);
+							}
+						} catch (MalformedURLException e) {
+							System.out.println("Unable to open URL!");
+							System.exit(1);
+						} catch (IOException e) {
+							
 						}
-					} catch (MalformedURLException e) {
-						System.out.println("Unable to open URL!");
-						System.exit(1);
-					} catch (IOException e) {
-						
 					}
+					numOfSites++;
 					break;
+					
+				// Rabin-Karp String Matching
 				case(2):
-					try {
-						while(tmpLine != null && this.isSearching()) {
-							tmpLine = br.readLine();
-							RabinKarp rks = new RabinKarp(this.getqText(), tmpLine);
-							// for testing
-							rks.test();
-							System.out.println(tmpLine);
-							String pat;
-							//pat = nss.giveString();
-							//System.out.println(pat);
+					while(numOfSites < MAX_SEARCH_DEPTH) {
+						try {
+							while(tmpLine != null && this.isSearching()) {
+								tmpLine = br.readLine();
+								RabinKarp rks = new RabinKarp(this.getqText(), tmpLine);
+								// for testing
+								rks.test();
+								System.out.println(tmpLine);
+								String pat;
+								//pat = nss.giveString();
+								//System.out.println(pat);
+							}
+						} catch (MalformedURLException e) {
+							System.out.println("Unable to open URL!");
+							System.exit(1);
+						} catch (IOException e) {
+							
 						}
-					} catch (MalformedURLException e) {
-						System.out.println("Unable to open URL!");
-						System.exit(1);
-					} catch (IOException e) {
-						
 					}
+					numOfSites++;
 					break;
+					
+				// Finite Automata String Matching
 				case(3):
-					try {
-						while(tmpLine != null && this.isSearching()) {
-							tmpLine = br.readLine();
-							FiniteAutomata fas = new FiniteAutomata(this.getqText(), tmpLine);
-							// for testing
-							fas.test();
-							String pat;
-							//pat = nss.giveString();
-							//System.out.println(pat);
+					while(numOfSites < MAX_SEARCH_DEPTH) {
+						try {
+							while(tmpLine != null && this.isSearching()) {
+								tmpLine = br.readLine();
+								FiniteAutomata fas = new FiniteAutomata(this.getqText(), tmpLine);
+								// for testing
+								fas.test();
+								String pat;
+								//pat = nss.giveString();
+								//System.out.println(pat);
+							}
+						} catch (MalformedURLException e) {
+							System.out.println("Unable to open URL!");
+							System.exit(1);
+						} catch (IOException e) {
+							
 						}
-					} catch (MalformedURLException e) {
-						System.out.println("Unable to open URL!");
-						System.exit(1);
-					} catch (IOException e) {
-						
 					}
+					numOfSites++;
 					break;
+					
+				// Knuth-Morris-Pratt String Matching
 				case(4):
-					try {
-						while(tmpLine != null && this.isSearching()) {
-							tmpLine = br.readLine();
-							KMP kmp = new KMP(this.getqText(), tmpLine);
-							// for testing
-							kmp.test();
-							String pat;
-							//pat = nss.giveString();
-							//System.out.println(pat);
+					while(numOfSites < MAX_SEARCH_DEPTH) {
+						try {
+							while(tmpLine != null && this.isSearching()) {
+								tmpLine = br.readLine();
+								KMP kmp = new KMP(this.getqText(), tmpLine);
+								// for testing
+								kmp.test();
+								String pat;
+								//pat = nss.giveString();
+								//System.out.println(pat);
+							}
+						} catch (MalformedURLException e) {
+							System.out.println("Unable to open URL!");
+							System.exit(1);
+						} catch (IOException e) {
+							
 						}
-					} catch (MalformedURLException e) {
-						System.out.println("Unable to open URL!");
-						System.exit(1);
-					} catch (IOException e) {
-						
 					}
+					numOfSites++;
 					break;
-				// Horrible Test Case, must get rid of later
-				case(99):
-					try {
-						while((tmpLine = br.readLine()) != null && this.isSearching()) {
-							JohnsMatching jms = new JohnsMatching(this.getqText(), tmpLine);
-							// for testing
-							String pat;
-							//pat = nss.giveString();
-							//System.out.println(pat);
-						}
-					} catch (MalformedURLException e) {
-						System.out.println("Unable to open URL!");
-						System.exit(1);
-					} catch (IOException e) {
-						
-					}
-					break;
+				
+				// Default Case
 				default:
 					System.out.println("Invalid String Matching Algorithm selected!");
 					System.exit(1);
 			}
-			// Build list of children from either 'href=' or 'src='
-			
-			// traverse in breadth-first order and recursively call the method
-			// This method will have variables to determine whether to move to
-			// a child or sibling
-			
-			// End the searching
-			//this.setSearching(false);
 		}
 	}
 	

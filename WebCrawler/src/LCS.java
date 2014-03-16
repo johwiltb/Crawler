@@ -27,7 +27,14 @@ public class LCS {
 	    }else{
 	        String a = match(query, fullLine.substring(0,fLineLen-1));
 	        String b = match(query.substring(0,qTextLen-1), fullLine);
-	        return (a.length() > b.length()) ? a : b;
+	        while ((a != null) && (b != null) && (a.length() > 3) && (b.length() > 3)) {
+		        if (a.length() > b.length())
+		        	return a;
+		        else
+		        	return b;
+	        }
+	        return null;
+	        //return (a.length() > b.length()) ? a : b;
 	    }
 	}
 }
