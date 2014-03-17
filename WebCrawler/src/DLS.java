@@ -14,10 +14,14 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
 public class DLS {
+	private AdjacencyListGraph g = new AdjacencyListGraph(16, true); 
+	private DFS dfs = new DFS();					// DFS used to build the tree
 	private int strMatchAlg; 						// Integer representing the chosen string matching algorithm
 	private String url, qText;						// String representing the URL and query text
 	private boolean searching = false; 				// Check to see if searching is running
@@ -72,6 +76,8 @@ public class DLS {
 	    	BufferedReader br = null;
 			br = new BufferedReader(isr);
 	    	String tmpLine = " ";			// Set for a space so it matches initial readLine
+	    	Vertex root = new Vertex(this.url);
+	    	g.addVertex(root);
 			
 			// Use string matching algorithm here to match query text
 			switch(this.getStrMatchAlg()) {
@@ -102,10 +108,23 @@ public class DLS {
 					
 				// Naive String Matching
 				case(1):
-					while(numOfSites < MAX_SEARCH_DEPTH) {
+					//while(numOfSites < MAX_SEARCH_DEPTH) {
 						try {
 							tmpLine = br.readLine();
 							while(tmpLine != null && this.isSearching()) {
+								NaiveString links = new NaiveString("href=", tmpLine);
+								String rawLink = links.matches();
+								if (rawLink != null) {
+									Pattern linkPat = Pattern.compile("href=\"(.*?)\"");
+									Matcher linkMatch = linkPat.matcher(rawLink);
+									String linkClean;
+									if (linkMatch.find()) {
+										linkClean = linkMatch.group(1);
+										Vertex a = new Vertex(linkClean);
+										g.addVertex(a);
+										g.addEdge(root, a);
+									}
+								}
 								NaiveString nss = new NaiveString(this.getqText(), tmpLine);
 								String pat;
 								pat = nss.matches();
@@ -119,7 +138,7 @@ public class DLS {
 						} catch (IOException e) {
 							
 						}
-					}
+					//}
 					numOfSites++;
 					break;
 					
