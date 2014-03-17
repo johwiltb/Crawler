@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+
 import javax.net.ssl.HttpsURLConnection;
 
 public class BFS {
@@ -93,13 +94,14 @@ public class BFS {
 				// Naive String Matching
 				case(1):
 					try {
-						while((tmpLine = br.readLine()) != null && this.isSearching()) {
+						tmpLine = br.readLine();
+						while(tmpLine != null && this.isSearching()) {
 							NaiveString nss = new NaiveString(this.getqText(), tmpLine);
-							// for testing
-							nss.test();
 							String pat;
-							//pat = nss.giveString();
-							//System.out.println(pat);
+							pat = nss.matches();
+							if (pat != null)
+								System.out.println(pat);
+							tmpLine = br.readLine();
 						}
 					} catch (MalformedURLException e) {
 						System.out.println("Unable to open URL!");

@@ -89,7 +89,6 @@ public class DLS {
 								//pat = nss.giveString();
 								if (pat != null)
 									System.out.println(tmpLine);
-								numOfSites++;
 							}
 						} catch (MalformedURLException e) {
 							System.out.println("Unable to open URL!");
@@ -105,14 +104,14 @@ public class DLS {
 				case(1):
 					while(numOfSites < MAX_SEARCH_DEPTH) {
 						try {
+							tmpLine = br.readLine();
 							while(tmpLine != null && this.isSearching()) {
-								tmpLine = br.readLine();
 								NaiveString nss = new NaiveString(this.getqText(), tmpLine);
-								// for testing
-								nss.test();
 								String pat;
-								//pat = nss.giveString();
-								//System.out.println(pat);
+								pat = nss.matches();
+								if (pat != null)
+									System.out.println(pat);
+								tmpLine = br.readLine();
 							}
 						} catch (MalformedURLException e) {
 							System.out.println("Unable to open URL!");

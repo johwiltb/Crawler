@@ -32,9 +32,9 @@ public class ConsoleCrawler {
 		}
 		switch(searchType) {
 			case 1:
-				DLS dfs = new DLS(urlText, queryText, (stringType-1));
-				dfs.setSearching(true);
-				dfs.search();
+				DLS dls = new DLS(urlText, queryText, (stringType-1));
+				dls.setSearching(true);
+				dls.search();
 				break;
 			case 2:
 				BFS bfs = new BFS(urlText, queryText, (stringType-1));
@@ -43,6 +43,7 @@ public class ConsoleCrawler {
 			default:
 				break;
 		}
+		System.out.println("\nThank you for using this!");
 	}
 
 }
