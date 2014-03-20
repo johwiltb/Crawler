@@ -112,19 +112,6 @@ public class DLS {
 						try {
 							tmpLine = br.readLine();
 							while(tmpLine != null && this.isSearching()) {
-								NaiveString links = new NaiveString("href=", tmpLine);
-								String rawLink = links.matches();
-								if (rawLink != null) {
-									Pattern linkPat = Pattern.compile("href=\"(.*?)\"");
-									Matcher linkMatch = linkPat.matcher(rawLink);
-									String linkClean;
-									if (linkMatch.find()) {
-										linkClean = linkMatch.group(1);
-										Vertex a = new Vertex(linkClean);
-										g.addVertex(a);
-										g.addEdge(root, a);
-									}
-								}
 								NaiveString nss = new NaiveString(this.getqText(), tmpLine);
 								String pat;
 								pat = nss.matches();
@@ -218,6 +205,14 @@ public class DLS {
 					System.exit(1);
 			}
 		}
+	}
+	
+	/**
+	 * Method to strip URL, then add to the collection
+	 * @param rawLine Raw input line from the page
+	 */
+	public void urlPull(String rawLine) {
+		// parse out URL info here, then add to collection
 	}
 	
 	/**
