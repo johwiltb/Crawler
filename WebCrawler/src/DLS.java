@@ -14,9 +14,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.net.ssl.HttpsURLConnection;
 
 public class DLS {
@@ -49,23 +46,23 @@ public class DLS {
 	public void search() {
 		if (this.isSearching()) {
 			int numOfSites = 0;								// Variable to track how deep the search has gone
-			URLConnection con = null;
-			InputStream ins = null;
-			InputStreamReader isr = null;
+			URLConnection conn = null;
+			InputStream inss = null;
+			InputStreamReader isrr = null;
 			
 			// Attempt to connect to the site, and match both HTTP and HTTPS
 			try {
 				URL urlSearch = new URL(getUrl());
 				if (getUrl().matches("^https")) {
-					con = (HttpsURLConnection)urlSearch.openConnection();
+					conn = (HttpsURLConnection)urlSearch.openConnection();
 				} else {
-					con = urlSearch.openConnection();
+					conn = urlSearch.openConnection();
 				}
 				
 				// Hehe, look like a real web browser
-				con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0");
-				ins = con.getInputStream();
-			    isr = new InputStreamReader(ins);
+				conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0");
+				inss = conn.getInputStream();
+			    isrr = new InputStreamReader(inss);
 			} catch (MalformedURLException e1) {
 				System.out.println("Unable to connect to URL!");
 				e1.printStackTrace();
@@ -74,10 +71,8 @@ public class DLS {
 				e.printStackTrace();
 			}
 	    	BufferedReader br = null;
-			br = new BufferedReader(isr);
+			br = new BufferedReader(isrr);
 	    	String tmpLine = " ";			// Set for a space so it matches initial readLine
-	    	Vertex root = new Vertex(this.url);
-	    	g.addVertex(root);
 			
 			// Use string matching algorithm here to match query text
 			switch(this.getStrMatchAlg()) {
