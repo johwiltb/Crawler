@@ -73,7 +73,7 @@ public class ConsoleCrawler {
 				//DLS dls = new DLS(urlText, queryText, (stringType-1));
 				//dls.setSearching(true);
 				//dls.search();
-				DepthFirst dls = new DepthFirst(getUrl(), MAX_DEPTH_LIMIT, 0, getStringType() - 1, queryText);
+				DepthFirst dls = new DepthFirst(getUrl(), MAX_DEPTH_LIMIT, MAX_DEPTH_LIMIT, getStringType() - 1, queryText);
 				break;
 			case 2:
 				BFS bfs = new BFS(urlText, queryText, (stringType-1));

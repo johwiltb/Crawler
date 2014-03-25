@@ -23,16 +23,15 @@ import java.util.regex.Pattern;
  */
 public class DepthFirst {
 	private ArrayList<String> links = new ArrayList<String>();
-	private int depthLimit, currentDepth, stringMatch;
+	private int depthLimit, stringMatch;
+	private static int currentDepth;
 	private String qryString;
-	//private String regex =  "\\(?\\b(http://|www[.])[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]";
-	private String regex =  "^.*href=\\\"\\(.*\\)\\\"";
-
-	private Pattern p = Pattern.compile("^.*href=\"(.*)\"");
+	private String regex = ".*href=\"([^\"]*?)\".*";
+	private Pattern p = Pattern.compile(regex);
 
 	public DepthFirst(String url, int dLimit, int curDepth, int strMatch, String query) {
 		this.depthLimit = dLimit;
-		this.currentDepth = curDepth;
+		currentDepth = curDepth;
 		this.stringMatch = strMatch;
 		this.qryString = query;
 		
@@ -59,9 +58,11 @@ public class DepthFirst {
 					String result = nsURL.matches();
 					if (result != null) {
 						Matcher m = p.matcher(result);
-						String urlStr = m.group(1);
-						links.add(urlStr);
-						System.out.println(this.currentDepth + " - " + urlStr);
+						if (m.matches()) {
+							String urlStr = m.group(1);
+							links.add(urlStr);
+							System.out.println(this.currentDepth + " - " + urlStr);
+						}
 					}	
 					// For matching the search query, deal with later
 					//NaiveString nss = new NaiveString(this.qryString, curLine);
@@ -89,9 +90,9 @@ public class DepthFirst {
 			}
 			
 			// TEST to make sure the algorithm is going recursively
-			System.out.println("The current depth is: " + (4 - this.currentDepth));
+			System.out.println("The current depth is: " + (4 - currentDepth));
 			for (int i = 0; i < links.size(); i++) {
-				DepthFirst next = new DepthFirst(this.links.get(i), this.depthLimit, this.currentDepth - 1, this.stringMatch, this.qryString);
+				DepthFirst next = new DepthFirst(this.links.get(i), this.depthLimit, currentDepth - 1, this.stringMatch, this.qryString);
 		}
 		// recursively search the next line
 		//for (int i = 0; i < url.length(); i++) {
