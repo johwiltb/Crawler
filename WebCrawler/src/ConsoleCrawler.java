@@ -29,6 +29,11 @@ public class ConsoleCrawler {
 		System.out.println("Welcome to the CLI version of webcrawler!\n");
 		System.out.print("URL: ");
 		urlText = input.nextLine();
+		
+		// add 'http://' if it contains no header
+		if (!urlText.contains("http"))
+			urlText = "http://" + urlText;
+		
 		System.out.print("queryText: ");
 		queryText = input.nextLine();
 		System.out.print("Choose your Search type\n(1): DLS\n(2): BFS\nChoice: ");
@@ -81,7 +86,6 @@ public class ConsoleCrawler {
 	}
 
 	private static int getStringType() {
-		// TODO Auto-generated method stub
 		return stringType;
 	}
 
