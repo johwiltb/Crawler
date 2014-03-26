@@ -7,9 +7,16 @@
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.HttpsURLConnection;
 /*
  DLS(node, goal, depth) {
   if ( depth >= 0 ) {
@@ -25,23 +32,99 @@ public class DepthFirst {
 	private ArrayList<String> links = new ArrayList<String>();
 	private int depthLimit, stringMatch;
 	private static int currentDepth;
-	private String qryString;
+	private String qryString, urlString;
 	private String regex = ".*href=\"([^\"]*?)\".*";
 	private Pattern p = Pattern.compile(regex);
+	private URLConnection con = null, rcon = null;
+	private InputStream ins = null, rins = null;
+	private InputStreamReader isr = null, risr = null;
+	private static ArrayList<String> robots = new ArrayList<String>();
 
 	public DepthFirst(String url, int dLimit, int curDepth, int strMatch, String query) {
 		this.depthLimit = dLimit;
 		currentDepth = curDepth;
 		this.stringMatch = strMatch;
 		this.qryString = query;
+		this.urlString = url;
 		
-		BufferedReader br = new BufferedReader(ConsoleCrawler.isr);
+		// Actually start the searching (add to a separate class later)
+		try {
+			URL urlSearch = new URL(this.urlString);
+			if (this.urlString.matches("^https")) {
+				con = (HttpsURLConnection)urlSearch.openConnection();
+			} else {
+				con = urlSearch.openConnection();
+			}
+			ins = con.getInputStream();
+		} catch (MalformedURLException e) {
+			System.out.println("Unable to connect to URL!");
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("Unable to open https connection");
+			e.printStackTrace();
+		}
+		
+	    this.isr = new InputStreamReader(ins);
+		BufferedReader br = new BufferedReader(this.isr);
 		String curLine = null;
 		try {
 			curLine = br.readLine();
 		} catch (IOException e) {
 			System.out.println("Cannot read from site!");
 			System.exit(1);
+		}
+		
+		// populate robots.txt info
+		if (curDepth == dLimit) {
+			try {
+				URL robotSearch = new URL(this.urlString + "/robots.txt");
+				if (this.urlString.matches("^https.*")) {
+					rcon = (HttpsURLConnection)robotSearch.openConnection();
+				} else {
+					rcon = robotSearch.openConnection();
+				}
+				rins = rcon.getInputStream();
+			} catch (MalformedURLException e) {
+				System.out.println("Unable to connect to URL!");
+				e.printStackTrace();
+			} catch (IOException e) {
+				System.out.println("Unable to open https connection");
+				e.printStackTrace();
+			}
+			
+		    risr = new InputStreamReader(rins);
+			BufferedReader rbr = new BufferedReader(risr);
+			String curRobotLine = null;
+			try {
+				curRobotLine = rbr.readLine();
+			} catch (IOException e1) {
+				System.out.println("Can't read robots.txt");
+			}
+			if (curRobotLine == null) { 
+				try {
+					curRobotLine = rbr.readLine();
+				} catch (IOException e) {
+					System.out.println("Cannot read from site!");
+					System.exit(1);
+				}
+			}
+			if (curRobotLine.contains("User-agent: ")) {
+				try {
+					curRobotLine = rbr.readLine();
+					while (!(curRobotLine == null)) {
+
+						Pattern urlP = Pattern.compile("^.*: (.*)");
+						Matcher rm = urlP.matcher(curRobotLine);
+						if (rm.matches()) {
+							robots.add(this.urlString + rm.group(1));
+						}
+						curRobotLine = rbr.readLine();
+					}
+				} catch (IOException e) {
+					System.out.println("Can't read from robots.txt");
+				}
+			}
+			
 		}
 		// check to make sure the depth hasn't hit its minimum
 		if ( curDepth >= 0 )
@@ -60,8 +143,13 @@ public class DepthFirst {
 						Matcher m = p.matcher(result);
 						if (m.matches()) {
 							String urlStr = m.group(1);
-							links.add(urlStr);
-							System.out.println(this.currentDepth + " - " + urlStr);
+							String fullStr = normalizeUrl(urlStr);
+							if (!(fullStr == null)) {
+								if (robotSafe(fullStr)) {
+									links.add(fullStr);
+									System.out.println(currentDepth + " - " + urlStr);
+								}
+							}
 						}
 					}	
 					// For matching the search query, deal with later
@@ -93,11 +181,35 @@ public class DepthFirst {
 			System.out.println("The current depth is: " + (4 - currentDepth));
 			for (int i = 0; i < links.size(); i++) {
 				DepthFirst next = new DepthFirst(this.links.get(i), this.depthLimit, currentDepth - 1, this.stringMatch, this.qryString);
+			}
 		}
-		// recursively search the next line
-		//for (int i = 0; i < url.length(); i++) {
-		//	DepthFirst next = new DepthFirst(this.links.get(i), this.depthLimit, this.currentDepth - 1, this.stringMatch, this.qryString);
+	}
+	
+	/**
+	 * Normalizes the URL to be added to the search list
+	 * @param url Seeding string for the url
+	 * @return Normalized URL to be added to links
+	 */
+	public String normalizeUrl(String url) {
+		String result;
+		if ((url.startsWith("http")) && !(url.startsWith(this.urlString)))
+			result = null;
+		else
+			result = this.urlString + "/" + url;
+		return result;
+	}
+	
+	/**
+	 * Checks to make sure the URL is safe to traverse
+	 * @param url URL to check
+	 * @return Boolean on where it follows robots.txt policy
+	 */
+	public boolean robotSafe(String url) {
+		for (int i = 0; i < robots.size(); i++) {
+			if (url.startsWith(robots.get(i)))
+				return false;
 		}
+		return true;
 	}
 
 }

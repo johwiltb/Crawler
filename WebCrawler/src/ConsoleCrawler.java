@@ -18,12 +18,7 @@ public class ConsoleCrawler {
 	private static final int MAX_DEPTH_LIMIT = 4;
 	private static String urlText, queryText;
 	private static int searchType, stringType;
-	private static Scanner input = new Scanner(System.in);
-	
-	// Added and used in later classes
-	private static URLConnection con = null;
-	private static InputStream ins = null;
-	protected static InputStreamReader isr = null;
+	private static Scanner input = new Scanner(System.in);	
 	
 	public static void main(String[] args) throws MalformedURLException {
 		System.out.println("Welcome to the CLI version of webcrawler!\n");
@@ -50,24 +45,6 @@ public class ConsoleCrawler {
 			stringType = input.nextInt();
 		}
 		
-		// Actually start the searching (add to a separate class later)
-		try {
-			URL urlSearch = new URL(getUrl());
-			if (getUrl().matches("^https")) {
-				con = (HttpsURLConnection)urlSearch.openConnection();
-			} else {
-				con = urlSearch.openConnection();
-			}
-			ins = con.getInputStream();
-		} catch (MalformedURLException e) {
-			System.out.println("Unable to connect to URL!");
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.out.println("Unable to open https connection");
-			e.printStackTrace();
-		}
-		
-	    isr = new InputStreamReader(ins);
 		switch(searchType) {
 			case 1:
 				//DLS dls = new DLS(urlText, queryText, (stringType-1));
