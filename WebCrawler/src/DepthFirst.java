@@ -6,6 +6,7 @@
 // Note on regex, the code for parsing out the URL from a string was found here: http://blog.houen.net/java-get-url-from-string/
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,6 +40,7 @@ public class DepthFirst {
 	private InputStream ins = null, rins = null;
 	private InputStreamReader isr = null, risr = null;
 	private static ArrayList<String> robots = new ArrayList<String>();
+	private final int CON_TIMEOUT = 4000;  		// Connection timeout (in milliseconds)
 
 	public DepthFirst(String url, int dLimit, int curDepth, int strMatch, String query) {
 		this.depthLimit = dLimit;
@@ -55,12 +57,15 @@ public class DepthFirst {
 			} else {
 				con = urlSearch.openConnection();
 			}
+			con.setConnectTimeout(CON_TIMEOUT);
 			ins = con.getInputStream();
 		} catch (MalformedURLException e) {
 			System.out.println("Unable to connect to URL!");
 			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			return;
 		} catch (IOException e) {
-			System.out.println("Unable to open https connection");
+			System.out.println("Unable to open connection");
 			e.printStackTrace();
 		}
 		
@@ -85,10 +90,12 @@ public class DepthFirst {
 				}
 				rins = rcon.getInputStream();
 			} catch (MalformedURLException e) {
-				System.out.println("Unable to connect to URL!");
+				System.out.println("Unable to connect to robots.txt!");
 				e.printStackTrace();
+			} catch (FileNotFoundException e) {
+				return;
 			} catch (IOException e) {
-				System.out.println("Unable to open https connection");
+				System.out.println("Unable to open robots.txt");
 				e.printStackTrace();
 			}
 			
@@ -139,21 +146,25 @@ public class DepthFirst {
 					//Naive String
 					NaiveString nsURL = new NaiveString("href=", curLine);
 					String result = nsURL.matches();
+					String fullStr = null;
 					if (result != null) {
 						Matcher m = p.matcher(result);
 						if (m.matches()) {
 							String urlStr = m.group(1);
-							String fullStr = normalizeUrl(urlStr);
+							fullStr = normalizeUrl(urlStr);
 							if (!(fullStr == null)) {
 								if (robotSafe(fullStr)) {
 									links.add(fullStr);
-									System.out.println(currentDepth + " - " + urlStr);
+									//System.out.println(currentDepth + " - " + urlStr);
 								}
 							}
 						}
 					}	
 					// For matching the search query, deal with later
-					//NaiveString nss = new NaiveString(this.qryString, curLine);
+					NaiveString nss = new NaiveString(this.qryString, curLine);
+					String queryMatch = nss.matches();
+					if (!(queryMatch == null) && !(fullStr == null))
+						System.out.println(fullStr);
 					break;
 				case 2:
 					//Rabin-Karp
@@ -193,6 +204,8 @@ public class DepthFirst {
 	public String normalizeUrl(String url) {
 		String result;
 		if ((url.startsWith("http")) && !(url.startsWith(this.urlString)))
+			result = null;
+		else if (url.contains(":"))
 			result = null;
 		else
 			result = this.urlString + "/" + url;

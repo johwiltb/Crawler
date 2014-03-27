@@ -23,6 +23,7 @@ public class UserMenu {
 	private String searchURL, searchText;	// Holds the user's URL choice and query text
     private boolean goPressed = false;		// Determines whether the button has been pressed (probably get rid of later)
     protected static boolean stopPressed = false; 	// Stops the searching
+    private final int MAX_DEPTH_SEARCH = 4;
 	
 	// Initiate options for searches and string matching
     private String[] searchOpts = {"Breadth First Search (BFS)", "Depth First Search (DFS)"};
@@ -198,8 +199,7 @@ public class UserMenu {
         	BFS search = new BFS(this.getSearchURL(), this.getSearchText(), this.getAlgString());
         	search.search();
         } else if (this.getAlgSearch() == 1) {
-        	DLS search = new DLS(this.getSearchURL(), this.getSearchText(), this.getAlgString());
-        	search.search();
+        	DepthFirst search = new DepthFirst(this.getSearchURL(), MAX_DEPTH_SEARCH, MAX_DEPTH_SEARCH, this.getAlgString() - 1, this.getSearchText());
         } else {
         	System.out.println("There was an issue in the choice of Search Algorithms");
         	System.exit(1);

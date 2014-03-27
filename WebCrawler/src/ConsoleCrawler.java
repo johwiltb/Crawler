@@ -4,15 +4,8 @@
  * Console Version Crawler for the web crawler.  Mostly used for testing purposes.
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Scanner;
-
-import javax.net.ssl.HttpsURLConnection;
 
 public class ConsoleCrawler {
 	private static final int MAX_DEPTH_LIMIT = 4;
@@ -47,9 +40,6 @@ public class ConsoleCrawler {
 		
 		switch(searchType) {
 			case 1:
-				//DLS dls = new DLS(urlText, queryText, (stringType-1));
-				//dls.setSearching(true);
-				//dls.search();
 				DepthFirst dls = new DepthFirst(getUrl(), MAX_DEPTH_LIMIT, MAX_DEPTH_LIMIT, getStringType() - 1, queryText);
 				break;
 			case 2:
