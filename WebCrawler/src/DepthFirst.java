@@ -50,9 +50,6 @@ public class DepthFirst {
 				con = urlSearch.openConnection();
 			}
 			con.setConnectTimeout(CON_TIMEOUT);
-			
-			// Change user agent
-			con.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 			ins = con.getInputStream();
 		} catch (MalformedURLException e) {
 			System.out.println("Unable to connect to URL!");
@@ -111,10 +108,20 @@ public class DepthFirst {
 					}
 				}
 				while (!(curRobotLine == null)) {
-					Pattern urlP = Pattern.compile("Disallow: (.*)");
-					Matcher rm = urlP.matcher(curRobotLine);
-					if (rm.matches()) {
-						robots.add(this.urlString + rm.group(1));
+					if (curRobotLine.startsWith("User-Agent: *")) {
+						while (!(curRobotLine == "") && !(curRobotLine == null)) {
+							Pattern urlP = Pattern.compile("Disallow: (.*)");
+							Matcher rm = urlP.matcher(curRobotLine);
+							if (rm.matches()) {
+								robots.add(this.urlString + rm.group(1));
+							}
+							try {
+								curRobotLine = rbr.readLine();
+							} catch (IOException e) {
+								System.out.println("Lost connection to robots.txt");
+								curRobotLine = null;
+							}
+						}
 					}
 					try {
 						curRobotLine = rbr.readLine();
@@ -144,10 +151,9 @@ public class DepthFirst {
 						if (m.matches()) {
 							String urlStr = m.group(1);
 							fullStr = normalizeUrl(urlStr);
-							if (!(fullStr == null))
-								ConsoleCrawler.pw.println(fullStr);
 							if (!(fullStr == null)) {
 								if (robotSafe(fullStr)) {
+									ConsoleCrawler.pw.println(fullStr);
 									links.add(fullStr);
 									visited.add(fullStr);
 								}
@@ -235,7 +241,7 @@ public class DepthFirst {
 	public boolean robotSafe(String url) {
 		if (!(robots == null)) {
 			for (int i = 0; i < robots.size(); i++) {
-				if (url.startsWith(robots.get(i)))
+				if (url.matches("^" + robots.get(i) + ".*"))
 					return false;
 			}
 		}

@@ -24,11 +24,10 @@ public class ConsoleCrawler {
 		try {
 			pw = new PrintWriter("./links", "UTF-8");
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Unable to open file storing links.  Check permissions"
+					+ " in the current directory");
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Does not accept encoding scheme for links file.");
 		}
 
 		System.out.println("Welcome to the CLI version of webcrawler!\n");
