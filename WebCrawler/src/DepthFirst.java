@@ -218,12 +218,12 @@ public class DepthFirst {
 			result = this.urlString.replace(re, url);
 		} else
 			result = ConsoleCrawler.urlText + "/" + url;
+		if (!(result == null) && result.contains("?"))
+			result = result.replaceFirst("\\?.*", "");
 		if (!(linkList == "[]")) {	
 			if (!(result == null) && visited.contains(result))
 				result = null;
 		}
-		if (!(result == null) && result.contains("?"))
-			result = result.replaceFirst("\\?.*", "");
 		return result;
 	}
 	
