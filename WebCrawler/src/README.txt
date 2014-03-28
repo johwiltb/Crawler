@@ -9,6 +9,17 @@ searching algorithm as well as the string matching algorithm.  The
 application will then print the results of the search back out to the 
 user.
 
+Current information about the project as follows:
+For policy following, the crawler obeys Disallow tags for all crawlers listed.
+This is because the crawler is not known as of yet, and I would rather be safe 
+than sorry.  
+
+Known Issues/Limitations:
+- Does not correctly crawl URLs with changing subdomains.  Strictly crawls URLs
+after the domain.
+- Does not understand non-standard robots.txt extensions.
+- Probably more!
+
 JRE -> JavaSE-1.7
 IDE -> Eclipse Kepler
 File list:

@@ -16,19 +16,8 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.net.ssl.HttpsURLConnection;
-/*
- DLS(node, goal, depth) {
-  if ( depth >= 0 ) {
-    if ( node == goal )
-      return node
 
-    for each child in expand(node)
-      DLS(child, goal, depth-1)
-  }
-}
- */
 public class DepthFirst {
 	private ArrayList<String> links = new ArrayList<String>();
 	private int depthLimit, stringMatch;
@@ -40,7 +29,10 @@ public class DepthFirst {
 	private InputStream ins = null, rins = null;
 	private InputStreamReader isr = null, risr = null;
 	private static ArrayList<String> robots = new ArrayList<String>();
+	private static ArrayList<String> visited = new ArrayList<String>();
 	private final int CON_TIMEOUT = 4000;  		// Connection timeout (in milliseconds)
+	
+	// need to have hash table for urls
 
 	public DepthFirst(String url, int dLimit, int curDepth, int strMatch, String query) {
 		this.depthLimit = dLimit;
@@ -58,6 +50,9 @@ public class DepthFirst {
 				con = urlSearch.openConnection();
 			}
 			con.setConnectTimeout(CON_TIMEOUT);
+			
+			// Change user agent
+			con.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 			ins = con.getInputStream();
 		} catch (MalformedURLException e) {
 			System.out.println("Unable to connect to URL!");
@@ -91,44 +86,41 @@ public class DepthFirst {
 				rins = rcon.getInputStream();
 			} catch (MalformedURLException e) {
 				System.out.println("Unable to connect to robots.txt!");
-				e.printStackTrace();
+				rcon = null;
 			} catch (FileNotFoundException e) {
-				return;
+				rcon = null;
 			} catch (IOException e) {
 				System.out.println("Unable to open robots.txt");
-				e.printStackTrace();
+				rcon = null;
 			}
-			
-		    risr = new InputStreamReader(rins);
-			BufferedReader rbr = new BufferedReader(risr);
-			String curRobotLine = null;
-			try {
-				curRobotLine = rbr.readLine();
-			} catch (IOException e1) {
-				System.out.println("Can't read robots.txt");
-			}
-			if (curRobotLine == null) { 
+			if (!(rcon == null)) {
+			    risr = new InputStreamReader(rins);
+				BufferedReader rbr = new BufferedReader(risr);
+				String curRobotLine = null;
 				try {
 					curRobotLine = rbr.readLine();
-				} catch (IOException e) {
-					System.out.println("Cannot read from site!");
-					System.exit(1);
+				} catch (IOException e1) {
+					System.out.println("Can't read robots.txt");
 				}
-			}
-			if (curRobotLine.contains("User-agent: ")) {
-				try {
-					curRobotLine = rbr.readLine();
-					while (!(curRobotLine == null)) {
-
-						Pattern urlP = Pattern.compile("^.*: (.*)");
-						Matcher rm = urlP.matcher(curRobotLine);
-						if (rm.matches()) {
-							robots.add(this.urlString + rm.group(1));
-						}
+				if (curRobotLine == null) { 
+					try {
 						curRobotLine = rbr.readLine();
+					} catch (IOException e) {
+						System.out.println("Cannot read from site!");
+						System.exit(1);
 					}
-				} catch (IOException e) {
-					System.out.println("Can't read from robots.txt");
+				}
+				while (!(curRobotLine == null)) {
+					Pattern urlP = Pattern.compile("Disallow: (.*)");
+					Matcher rm = urlP.matcher(curRobotLine);
+					if (rm.matches()) {
+						robots.add(this.urlString + rm.group(1));
+					}
+					try {
+						curRobotLine = rbr.readLine();
+					} catch (IOException e) {
+						System.out.println("Connection was lost!");
+					}
 				}
 			}
 			
@@ -152,10 +144,12 @@ public class DepthFirst {
 						if (m.matches()) {
 							String urlStr = m.group(1);
 							fullStr = normalizeUrl(urlStr);
+							if (!(fullStr == null))
+								ConsoleCrawler.pw.println(fullStr);
 							if (!(fullStr == null)) {
 								if (robotSafe(fullStr)) {
 									links.add(fullStr);
-									//System.out.println(currentDepth + " - " + urlStr);
+									visited.add(fullStr);
 								}
 							}
 						}
@@ -189,9 +183,10 @@ public class DepthFirst {
 			}
 			
 			// TEST to make sure the algorithm is going recursively
-			System.out.println("The current depth is: " + (4 - currentDepth));
+			//System.out.println("The current depth is: " + (4 - currentDepth));
 			for (int i = 0; i < links.size(); i++) {
 				DepthFirst next = new DepthFirst(this.links.get(i), this.depthLimit, currentDepth - 1, this.stringMatch, this.qryString);
+				currentDepth++;
 			}
 		}
 	}
@@ -203,12 +198,32 @@ public class DepthFirst {
 	 */
 	public String normalizeUrl(String url) {
 		String result;
-		if ((url.startsWith("http")) && !(url.startsWith(this.urlString)))
-			result = null;
+		String re = "\\/.*\\/(.*)$";
+		String linkList = visited.toString();
+		
+		if ((url.startsWith("http"))) {
+			if (!(url.startsWith("http://www")))
+					url = url.replace("http://", "http://www.");
+			if (!url.startsWith(this.urlString))
+				result = null;
+			else
+				result = url;
+		}
 		else if (url.contains(":"))
 			result = null;
-		else
-			result = this.urlString + "/" + url;
+		else if (url.startsWith("/"))
+			result = ConsoleCrawler.urlText + url;
+		else if (url.startsWith("./")) {
+			url.replace(".", "");
+			result = this.urlString.replace(re, url);
+		} else
+			result = ConsoleCrawler.urlText + "/" + url;
+		if (!(linkList == "[]")) {	
+			if (!(result == null) && visited.contains(result))
+				result = null;
+		}
+		if (!(result == null) && result.contains("?"))
+			result = result.replaceFirst("\\?.*", "");
 		return result;
 	}
 	
@@ -218,9 +233,11 @@ public class DepthFirst {
 	 * @return Boolean on where it follows robots.txt policy
 	 */
 	public boolean robotSafe(String url) {
-		for (int i = 0; i < robots.size(); i++) {
-			if (url.startsWith(robots.get(i)))
-				return false;
+		if (!(robots == null)) {
+			for (int i = 0; i < robots.size(); i++) {
+				if (url.startsWith(robots.get(i)))
+					return false;
+			}
 		}
 		return true;
 	}

@@ -4,23 +4,44 @@
  * Console Version Crawler for the web crawler.  Mostly used for testing purposes.
  */
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.Scanner;
 
 public class ConsoleCrawler {
 	private static final int MAX_DEPTH_LIMIT = 4;
-	private static String urlText, queryText;
+	protected static String urlText;
+	private static String queryText;
 	private static int searchType, stringType;
 	private static Scanner input = new Scanner(System.in);	
-	
+		
+	protected static PrintWriter pw;
+
 	public static void main(String[] args) throws MalformedURLException {
+		// Print links to file
+		try {
+			pw = new PrintWriter("./links", "UTF-8");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		System.out.println("Welcome to the CLI version of webcrawler!\n");
 		System.out.print("URL: ");
 		urlText = input.nextLine();
 		
-		// add 'http://' if it contains no header
-		if (!urlText.contains("http"))
-			urlText = "http://" + urlText;
+		// add 'http://(www)' if it contains no header
+		if (!(urlText.contains("http"))) {
+			if (!(urlText.contains("www"))) 
+				urlText = "http://www." + urlText;
+			else 
+				urlText = "http://" + urlText;
+		}
 		
 		System.out.print("queryText: ");
 		queryText = input.nextLine();
@@ -49,6 +70,7 @@ public class ConsoleCrawler {
 			default:
 				break;
 		}
+		pw.close();
 		System.out.println("\nThank you for using this!");
 	}
 
