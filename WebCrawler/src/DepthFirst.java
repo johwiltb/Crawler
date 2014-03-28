@@ -104,16 +104,19 @@ public class DepthFirst {
 						curRobotLine = rbr.readLine();
 					} catch (IOException e) {
 						System.out.println("Cannot read from site!");
-						System.exit(1);
 					}
 				}
 				while (!(curRobotLine == null)) {
-					if (curRobotLine.startsWith("User-Agent: *")) {
+					if (curRobotLine.matches("^[ \\t]*User-Agent: \\*\\.*")) {
 						while (!(curRobotLine == "") && !(curRobotLine == null)) {
 							Pattern urlP = Pattern.compile("Disallow: (.*)");
 							Matcher rm = urlP.matcher(curRobotLine);
 							if (rm.matches()) {
-								robots.add(this.urlString + rm.group(1));
+								String adder = rm.group(1);
+								adder = adder.replaceAll("\\.", "\\\\.");
+								adder = adder.replaceAll("\\*", "\\.\\*");
+								adder = adder.replaceFirst("#.*", "");
+								robots.add(this.urlString + adder);
 							}
 							try {
 								curRobotLine = rbr.readLine();
@@ -241,7 +244,8 @@ public class DepthFirst {
 	public boolean robotSafe(String url) {
 		if (!(robots == null)) {
 			for (int i = 0; i < robots.size(); i++) {
-				if (url.matches("^" + robots.get(i) + ".*"))
+				String reg = "^" + robots.get(i) + ".*$";
+				if (url.matches(reg))
 					return false;
 			}
 		}
