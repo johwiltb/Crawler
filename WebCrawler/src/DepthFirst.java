@@ -50,7 +50,13 @@ public class DepthFirst {
 				con = urlSearch.openConnection();
 			}
 			con.setConnectTimeout(CON_TIMEOUT);
-			ins = con.getInputStream();
+			con.setRequestProperty("User-Agent", "EpiCrawl v1.0");
+			try {
+				ins = con.getInputStream();
+			} catch (IOException e) {
+				// Error code for file
+				return;
+			}
 		} catch (MalformedURLException e) {
 			System.out.println("Unable to connect to URL!");
 			e.printStackTrace();
@@ -220,8 +226,26 @@ public class DepthFirst {
 		}
 		else if (url.contains(":"))
 			result = null;
+		
+		// Not working correctly yet
+		else if (url.startsWith("//")) {
+			String adder = url.replaceFirst("\\/\\/[^\\/].*?\\/", "");
+			result = ConsoleCrawler.urlText + "/" + adder;
+		}
+		
 		else if (url.startsWith("/"))
 			result = ConsoleCrawler.urlText + url;
+		// add ../ condition
+		else if (url.startsWith("../")) {
+			String adder = null;
+			while (url.contains("../")) {
+				adder = this.urlString.replaceFirst("(\\/[^\\/]*?)\\/[^\\/]*?$", "");
+				url = url.replaceFirst("\\.\\.", "");
+			}
+			if (url.contains("//"))
+				url = url.replaceAll("//", "/");
+			result = adder + url;
+		}
 		else if (url.startsWith("./")) {
 			url.replace(".", "");
 			result = this.urlString.replace(re, url);
@@ -229,6 +253,10 @@ public class DepthFirst {
 			result = ConsoleCrawler.urlText + "/" + url;
 		if (!(result == null) && result.contains("?"))
 			result = result.replaceFirst("\\?.*", "");
+		if (!(result == null) && result.contains("#"))
+			result = result.replaceFirst("#.*", "");
+		if (!(result == null) && !(result.contains(ConsoleCrawler.urlText)))
+			result = null;
 		if (!(linkList == "[]")) {	
 			if (!(result == null) && visited.contains(result))
 				result = null;

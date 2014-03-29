@@ -2,7 +2,7 @@ Johnathan Wiltberger
 
 *All programming done on Mac OSX Mavericks*
 
-Project - Web Crawler
+Project - EpiCrawl
 Application is used to crawl a specific, user-defined domain for a user-
 defined text query.  The application allows the user to choose both the
 searching algorithm as well as the string matching algorithm.  The 

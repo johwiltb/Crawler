@@ -30,7 +30,7 @@ public class ConsoleCrawler {
 			System.out.println("Does not accept encoding scheme for links file.");
 		}
 
-		System.out.println("Welcome to the CLI version of webcrawler!\n");
+		System.out.println("Welcome to the CLI version of EpiCrawl!\n");
 		System.out.print("URL: ");
 		urlText = input.nextLine();
 		
