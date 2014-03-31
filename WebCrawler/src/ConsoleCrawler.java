@@ -60,6 +60,7 @@ public class ConsoleCrawler {
 		
 		switch(searchType) {
 			case 1:
+				System.out.println("Results will be printed below:\n");
 				DepthFirst dls = new DepthFirst(getUrl(), MAX_DEPTH_LIMIT, MAX_DEPTH_LIMIT, getStringType() - 1, queryText);
 				break;
 			case 2:

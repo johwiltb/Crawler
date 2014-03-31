@@ -26,7 +26,7 @@ public class UserMenu {
     private final int MAX_DEPTH_SEARCH = 4;
 	
 	// Initiate options for searches and string matching
-    private String[] searchOpts = {"Breadth First Search (BFS)", "Depth First Search (DFS)"};
+    private String[] searchOpts = {"Breadth First Search (BFS)", "Depth Limited Search (DLS)"};
     private String[] stringMatches = {"Longest Common Sequence", "Naive String Matching Algorithm", "Rabin-Karp Algorithm", "Finite Automata Algorithm", "KMP Algorithm"};
 
     public UserMenu() { }
@@ -80,11 +80,11 @@ public class UserMenu {
         
         // Stop Button
         final JButton stopBtn = new JButton("Stop");
-        stopBtn.setEnabled(false);
+        stopBtn.setEnabled(true);
         stopBtn.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		while (getGoPressed()) {
-        			stopPressed = true;
+        			System.exit(0);
         		}
         	}
         });
@@ -140,6 +140,13 @@ public class UserMenu {
      * @param selection URL that is to be searched
      */
     public void setSearchURL(String selection) {
+    	// add 'http://(www)' if it contains no header
+		if (!(selection.contains("http"))) {
+			if (!(selection.contains("www"))) 
+				selection = "http://www." + selection;
+			else 
+				selection = "http://" + selection;
+		}
     	searchURL = selection;
     }
     
@@ -199,7 +206,7 @@ public class UserMenu {
         	BFS search = new BFS(this.getSearchURL(), this.getSearchText(), this.getAlgString());
         	search.search();
         } else if (this.getAlgSearch() == 1) {
-        	DepthFirst search = new DepthFirst(this.getSearchURL(), MAX_DEPTH_SEARCH, MAX_DEPTH_SEARCH, this.getAlgString() - 1, this.getSearchText());
+        	DepthFirst search = new DepthFirst(this.getSearchURL(), MAX_DEPTH_SEARCH, MAX_DEPTH_SEARCH, this.getAlgString(), this.getSearchText());
         } else {
         	System.out.println("There was an issue in the choice of Search Algorithms");
         	System.exit(1);
