@@ -7,7 +7,10 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 /**
@@ -20,9 +23,9 @@ import javax.swing.JTextField;
 public class EpiCrawl {
 	private int algSearch, algString;		// Holds choices for search algorithm and string matching algorithm
 	private String searchURL, searchText;	// Holds the user's URL choice and query text
-    private boolean goPressed = false;		// Determines whether the button has been pressed (probably get rid of later)
     protected static boolean stopPressed = false; 	// Stops the searching
-    private final int MAX_DEPTH_SEARCH = 4;
+    private int modifier;					// Determine either max pages or max depth, depending on value
+    private String strMod;
 	
 	// Initiate options for searches and string matching
     private String[] searchOpts = {"Breadth First Search (BFS)", "Depth Limited Search (DLS)"};
@@ -40,9 +43,16 @@ public class EpiCrawl {
     private JPanel urlPanel = new JPanel();
     private JPanel qryPanel = new JPanel();
     private JPanel btnPanel = new JPanel();
+    
+    // Used to print out results
+    protected static JTextArea resultsTxtArea = new JTextArea("Results displayed below:");
+    private JScrollPane resultScrollBx = new JScrollPane(resultsTxtArea);
 
-    public EpiCrawl() {
-    	
+    public EpiCrawl() { }
+    
+    public void buildMenu() {
+    	resultsTxtArea.setEnabled(false);
+    	resultsTxtArea.setEditable(true);
     	// Set default behaviors of the panels and frames
     	mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     	mainFrame.setTitle("EpiCrawl");
@@ -55,13 +65,13 @@ public class EpiCrawl {
     	
     	// Set up search panel
     	JLabel searchTypeLabel = new JLabel("Search Type:");
-    	JComboBox<String> searchTypeCmbBx = new JComboBox<String>(searchOpts);
+    	final JComboBox<String> searchTypeCmbBx = new JComboBox<String>(searchOpts);
     	searchTypePanel.add(searchTypeLabel);
     	searchTypePanel.add(searchTypeCmbBx);
     	
     	// Set up string matching panel
     	JLabel strMatchLabel = new JLabel("String Matching Type:");
-    	JComboBox<String> strMatchCmbBx = new JComboBox<String>(stringMatches);
+    	final JComboBox<String> strMatchCmbBx = new JComboBox<String>(stringMatches);
     	strMatchPanel.add(strMatchLabel);
     	strMatchPanel.add(strMatchCmbBx);
     	
@@ -69,7 +79,7 @@ public class EpiCrawl {
     	final JLabel DfxtraSrchParamsLbl = new JLabel("<html>Max Depth<br>to Search</html>");
     	final JLabel BfxtraSrchParamsLbl = new JLabel("<html>Max Number<br>of Pages</html>");
     	JLabel blankLabel = new JLabel(" ");
-    	JTextField xtraSrchParamsTxtFld = new JTextField(10);
+    	final JTextField xtraSrchParamsTxtFld = new JTextField(10);
     	JPanel xtraSrchParamsTxtPanel = new JPanel();
     	xtraSrchParamsTxtPanel.setLayout(new BoxLayout(xtraSrchParamsTxtPanel, BoxLayout.PAGE_AXIS));
     	
@@ -99,54 +109,85 @@ public class EpiCrawl {
     	
     	// Set up the URL panel
     	JLabel urlLabel = new JLabel("URL:");
-    	JTextField urlTxtFld = new JTextField(40);
+    	final JTextField urlTxtFld = new JTextField(40);
     	urlPanel.add(urlLabel);
     	urlPanel.add(urlTxtFld);
     	
     	// Set up the query panel
     	JLabel qryLable = new JLabel("Query:");
-    	JTextField qryTxtFld = new JTextField(39);
+    	final JTextField qryTxtFld = new JTextField(39);
     	qryPanel.add(qryLable);
     	qryPanel.add(qryTxtFld);
     	
     	// Create Buttons for search
     	JButton goBtn = new JButton("Go");
-    	goBtn.setEnabled(true);
-    	
+        JButton stopBtn = new JButton("Stop");
+    	goBtn.setEnabled(true);    	
+        stopBtn.setEnabled(true);
+        
+        goBtn.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		algSearch = searchTypeCmbBx.getSelectedIndex();
+        		algString = strMatchCmbBx.getSelectedIndex();
+        		searchURL = urlTxtFld.getText();
+        		searchText = qryTxtFld.getText();
+        		strMod = xtraSrchParamsTxtFld.getText();
+        		pressGo();
+        	}
+        });
+        
+        stopBtn.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		stopPressed = true;
+        	}
+        });
+        
+        btnPanel.add(goBtn);
+        btnPanel.add(stopBtn);
+        
     	// Add all the separate panels to the main panel
     	mainPanel.add(searchParamsPanel);
     	mainPanel.add(urlPanel);
     	mainPanel.add(qryPanel);
     	mainPanel.add(btnPanel);
-    	
-    }
-    
-    
-    public void start() {
     	// Add all the panels to the GUI and make it visible
     	mainFrame.add(mainPanel, BorderLayout.CENTER);
-    	// uframe.getRootPane().setDefaultButton(goBtn);
+    	mainFrame.getRootPane().setDefaultButton(goBtn);
     	mainFrame.pack();
     	mainFrame.setVisible(true);
-    	
-    	/*
-    	 * try {
-                     int1 = Integer.parseInt(JTextField.getText());   //This was a string coming from a resultset that I changed into and Int
-                     JTextField.requestFocusInWindow();
-                     } catch (Exception z) { 
-                         JOptionPane.showMessageDialog(this, "Incorrect Data Type! Numbers Only!",
-                            "Inane error", JOptionPane.ERROR_MESSAGE);
-                         JTextField.setText("");
-                         JTextField.requestFocusInWindow();
-                         return;
-                }
-    	 */
     }
-
+    
+    
+    public void pressGo() {
+    	try {
+			modifier = Integer.parseInt(strMod);
+		} catch (Exception e1) {
+			JOptionPane.showMessageDialog(null, "Only integers in the 'Max Search' field!");
+			return;
+		}
+    	CrHandler handle = new CrHandler("gui");
+    	handle.normURL(searchURL);
+    	searchURL = handle.getURL();
+    	resultScrollBx.setVisible(true);
+    	
+    	if (this.algSearch == 0) {
+        	BFS search = new BFS(this.searchURL, this.searchText, this.algString);
+        	search.search();
+        } else if (this.algSearch == 1) {
+        	DepthFirst search = new DepthFirst(this.searchURL, this.modifier, this.modifier, this.algString, this.searchText);
+        	CrHandler.pw.close();
+        	resultsTxtArea.append("All Finished!");
+        	//System.out.println("All Finished!");
+        } else {
+        	resultsTxtArea.append("There was an issue in the choice of Search Algorithms");
+        	//System.out.println("There was an issue in the choice of Search Algorithms");
+        	System.exit(1);
+        }
+	}
 
 	public static void main(String[] args) {
 		EpiCrawl crawl = new EpiCrawl();
-		crawl.start();
+		crawl.buildMenu();
 	}
 
 }

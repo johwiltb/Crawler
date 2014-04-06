@@ -4,9 +4,6 @@
  * Console Version Crawler for the web crawler.  Mostly used for testing purposes.
  */
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.Scanner;
 
@@ -17,30 +14,15 @@ public class ConsoleCrawler {
 	private static int searchType, stringType;
 	private static Scanner input = new Scanner(System.in);	
 		
-	protected static PrintWriter pw;
 
 	public static void main(String[] args) throws MalformedURLException {
-		// Print links to file
-		try {
-			pw = new PrintWriter("./links", "UTF-8");
-		} catch (FileNotFoundException e) {
-			System.out.println("Unable to open file storing links.  Check permissions"
-					+ " in the current directory");
-		} catch (UnsupportedEncodingException e) {
-			System.out.println("Does not accept encoding scheme for links file.");
-		}
 
 		System.out.println("Welcome to the CLI version of EpiCrawl!\n");
 		System.out.print("URL: ");
 		urlText = input.nextLine();
-		
-		// add 'http://(www)' if it contains no header
-		if (!(urlText.contains("http"))) {
-			if (!(urlText.contains("www"))) 
-				urlText = "http://www." + urlText;
-			else 
-				urlText = "http://" + urlText;
-		}
+		CrHandler handle = new CrHandler("console");
+		handle.normURL(urlText);
+		urlText = handle.getURL();
 		
 		System.out.print("queryText: ");
 		queryText = input.nextLine();
@@ -70,7 +52,7 @@ public class ConsoleCrawler {
 			default:
 				break;
 		}
-		pw.close();
+		handle.pw.close();
 		System.out.println("\nThank you for using this!");
 	}
 

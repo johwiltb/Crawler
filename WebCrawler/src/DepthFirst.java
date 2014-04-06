@@ -41,7 +41,11 @@ public class DepthFirst {
 		this.qryString = query;
 		this.urlString = url;
 		
-		// Actually start the searching (add to a separate class later)
+		if (EpiCrawl.stopPressed) {
+			CrHandler.printOut("Interruption Detected!\nThank you for using!");
+			System.exit(1);
+		}
+		currentDepth++;	
 		try {
 			URL urlSearch = new URL(this.urlString);
 			if (this.urlString.matches("^https")) {
@@ -58,12 +62,14 @@ public class DepthFirst {
 				return;
 			}
 		} catch (MalformedURLException e) {
-			System.out.println("Unable to connect to URL!");
+			//System.out.println("Unable to connect to URL!");
+			CrHandler.printOut("Unable to connect to URL!");
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
 			return;
 		} catch (IOException e) {
-			System.out.println("Unable to open connection");
+			//System.out.println("Unable to open connection");
+			CrHandler.printOut("Unable to open connection!");
 			e.printStackTrace();
 		}
 		
@@ -73,7 +79,8 @@ public class DepthFirst {
 		try {
 			curLine = br.readLine();
 		} catch (IOException e) {
-			System.out.println("Cannot read from site!");
+			//System.out.println("Cannot read from site!");
+			CrHandler.printOut("Cannot read from site!");
 			System.exit(1);
 		}
 		
@@ -88,12 +95,14 @@ public class DepthFirst {
 				}
 				rins = rcon.getInputStream();
 			} catch (MalformedURLException e) {
-				System.out.println("Unable to connect to robots.txt!");
+				//System.out.println("Unable to connect to robots.txt!");
+				CrHandler.printOut("Unable to connect to robots.txt!");
 				rcon = null;
 			} catch (FileNotFoundException e) {
 				rcon = null;
 			} catch (IOException e) {
-				System.out.println("Unable to open robots.txt");
+				//System.out.println("Unable to open robots.txt");
+				CrHandler.printOut("Unable to open robots.txt");
 				rcon = null;
 			}
 			if (!(rcon == null)) {
@@ -103,13 +112,15 @@ public class DepthFirst {
 				try {
 					curRobotLine = rbr.readLine();
 				} catch (IOException e1) {
-					System.out.println("Can't read robots.txt");
+					//System.out.println("Can't read robots.txt");
+					CrHandler.printOut("Can't read robots.txt");
 				}
 				if (curRobotLine == null) { 
 					try {
 						curRobotLine = rbr.readLine();
 					} catch (IOException e) {
-						System.out.println("Cannot read from site!");
+						//System.out.println("Cannot read from site!");
+						CrHandler.printOut("Cannot read robots.txt from site!");
 					}
 				}
 				while (!(curRobotLine == null)) {
@@ -127,7 +138,8 @@ public class DepthFirst {
 							try {
 								curRobotLine = rbr.readLine();
 							} catch (IOException e) {
-								System.out.println("Lost connection to robots.txt");
+								//System.out.println("Lost connection to robots.txt");
+								CrHandler.printOut("Lost connection to robots.txt");
 								curRobotLine = null;
 							}
 						}
@@ -135,7 +147,8 @@ public class DepthFirst {
 					try {
 						curRobotLine = rbr.readLine();
 					} catch (IOException e) {
-						System.out.println("Connection was lost!");
+						//System.out.println("Connection was lost!");
+						CrHandler.printOut("Connection was lost!");
 					}
 				}
 			}
@@ -162,9 +175,11 @@ public class DepthFirst {
 							fullStr = normalizeUrl(urlStr);
 							if (!(fullStr == null)) {
 								if (robotSafe(fullStr)) {
-									ConsoleCrawler.pw.println(fullStr);
-									links.add(fullStr);
+									CrHandler.pw.println(fullStr);
+									//links.add(fullStr);
 									visited.add(fullStr);
+									//testing
+									DepthFirst next = new DepthFirst(fullStr, this.depthLimit, currentDepth - 1, this.stringMatch, this.qryString);
 								}
 							}
 						}
@@ -173,7 +188,8 @@ public class DepthFirst {
 					NaiveString nss = new NaiveString(this.qryString, curLine);
 					String queryMatch = nss.matches();
 					if (!(queryMatch == null) && !(fullStr == null))
-						System.out.println(fullStr);
+						//System.out.println(fullStr);
+						CrHandler.printOut(fullStr);
 					break;
 				case 2:
 					//Rabin-Karp
@@ -185,24 +201,26 @@ public class DepthFirst {
 					//KMP
 					break;
 				default:
-					System.out.println("Incorrect String matching algorithm selected!");
+					//System.out.println("Incorrect String matching algorithm selected!");
+					CrHandler.printOut("Incorrect String matching algorithm selected!");
 					System.exit(1);
 					break;
 				}
 				try {
 					curLine = br.readLine();
 				} catch (IOException e) {
-					System.out.println("Cannot read from site!");
+					//System.out.println("Cannot read from site!");
+					CrHandler.printOut("Cannot read from site!");
 					System.exit(1);
 				}
 			}
 			
 			// TEST to make sure the algorithm is going recursively
 			//System.out.println("The current depth is: " + (4 - currentDepth));
-			for (int i = 0; i < links.size(); i++) {
-				DepthFirst next = new DepthFirst(this.links.get(i), this.depthLimit, currentDepth - 1, this.stringMatch, this.qryString);
-				currentDepth++;
-			}
+			//for (int i = 0; i < links.size(); i++) {
+				//DepthFirst next = new DepthFirst(this.links.get(i), this.depthLimit, currentDepth - 1, this.stringMatch, this.qryString);
+				//currentDepth++;
+			//}
 		}
 	}
 	
@@ -230,11 +248,11 @@ public class DepthFirst {
 		// Not working correctly yet
 		else if (url.startsWith("//")) {
 			String adder = url.replaceFirst("\\/\\/[^\\/].*?\\/", "");
-			result = ConsoleCrawler.urlText + "/" + adder;
+			result = CrHandler.normURL + "/" + adder;
 		}
 		
 		else if (url.startsWith("/"))
-			result = ConsoleCrawler.urlText + url;
+			result = CrHandler.normURL + url;
 		// add ../ condition
 		else if (url.startsWith("../")) {
 			String adder = null;
@@ -250,12 +268,12 @@ public class DepthFirst {
 			url.replace(".", "");
 			result = this.urlString.replace(re, url);
 		} else
-			result = ConsoleCrawler.urlText + "/" + url;
+			result = CrHandler.normURL + "/" + url;
 		if (!(result == null) && result.contains("?"))
 			result = result.replaceFirst("\\?.*", "");
 		if (!(result == null) && result.contains("#"))
 			result = result.replaceFirst("#.*", "");
-		if (!(result == null) && !(result.contains(ConsoleCrawler.urlText)))
+		if (!(result == null) && !(result.contains(CrHandler.normURL)))
 			result = null;
 		if (!(linkList == "[]")) {	
 			if (!(result == null) && visited.contains(result))
