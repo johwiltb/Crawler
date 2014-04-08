@@ -48,7 +48,7 @@ public class EpiCrawl {
     private JPanel btnPanel = new JPanel();
     
     // Used to print out results
-    protected static JTextArea resultsTxtArea = new JTextArea("Results displayed below:\n");
+    protected static JTextArea resultsTxtArea = new JTextArea();
     protected static JScrollPane resultScrollBx = new JScrollPane(resultsTxtArea);
     private JPanel resultPanel = new JPanel();
     protected static JFrame resultFrame = new JFrame();
@@ -73,8 +73,7 @@ public class EpiCrawl {
     			+ "in the hope that it will be useful, but WITHOUT\n"
     			+ "ANY WARRANTY; without even the implied warranty of\n"
     			+ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n"
-    			+ "You must press 'Ok' to continue...";
-    	
+    			+ "You must press 'Ok' to continue...";	
     	loadPanel.setLayout(new BoxLayout(loadPanel, BoxLayout.Y_AXIS));
     	loadText.setEditable(false);
     	loadText.setBorder(new EmptyBorder(3,3,3,3));
@@ -91,10 +90,10 @@ public class EpiCrawl {
     	// Build Main Menu
     	resultsTxtArea.setEnabled(false);
     	resultsTxtArea.setEditable(true);
+    	
     	// Set default behaviors of the panels and frames
     	mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     	mainFrame.setTitle("EpiCrawl");
-    	
     	mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
     	searchParamsPanel.setLayout(new BoxLayout(searchParamsPanel, BoxLayout.X_AXIS));
     	combSearchesPanel.setLayout(new BoxLayout(combSearchesPanel, BoxLayout.PAGE_AXIS));
@@ -211,6 +210,7 @@ public class EpiCrawl {
     		JOptionPane.showMessageDialog(null, "Please fill out all query boxes!");
     		return;
     	}
+    	resultsTxtArea.setText("Results displayed below:\n");
     	CrHandler handle = new CrHandler("gui");
     	handle.normURL(searchURL);
     	searchURL = handle.getURL();

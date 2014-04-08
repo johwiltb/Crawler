@@ -20,7 +20,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class BFS {
 	private int strMatchAlg;			// Integer representing the chosen string matching algorithm
-	private String url, qText, curLine;	// String representing the URL and query text
+	private String url, qText;	// String representing the URL and query text
 	
 	/**
 	 * Constructor for BFS.  Takes in the important information for the class
@@ -119,9 +119,6 @@ public class BFS {
 							// for testing
 							rks.test();
 							System.out.println(tmpLine);
-							String pat;
-							//pat = nss.giveString();
-							//System.out.println(pat);
 						}
 					} catch (MalformedURLException e) {
 						System.out.println("Unable to open URL!");
@@ -138,9 +135,6 @@ public class BFS {
 							FiniteAutomata fas = new FiniteAutomata(this.getqText(), tmpLine);
 							// for testing
 							fas.test();
-							String pat;
-							//pat = nss.giveString();
-							//System.out.println(pat);
 						}
 					} catch (MalformedURLException e) {
 						System.out.println("Unable to open URL!");
@@ -157,9 +151,6 @@ public class BFS {
 							KMP kmp = new KMP(this.getqText(), tmpLine);
 							// for testing
 							kmp.test();
-							String pat;
-							//pat = nss.giveString();
-							//System.out.println(pat);
 						}
 					} catch (MalformedURLException e) {
 						System.out.println("Unable to open URL!");

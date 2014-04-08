@@ -42,7 +42,7 @@ import java.util.Scanner;
 public class ConsoleCrawler {
 	private static int optionalNum;
 	protected static String urlText;
-	private static String queryText, temp;
+	private static String queryText;
 	private static int searchType, stringType;
 	private static Scanner input = new Scanner(System.in);	
 		

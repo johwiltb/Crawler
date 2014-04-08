@@ -23,10 +23,12 @@ import javax.net.ssl.HttpsURLConnection;
  * and more.
  */
 public class CrHandler {
-	protected static String normURL;
-	protected static PrintWriter pw;
+	protected static String normURL, urlString; // normURL = domain being searched, urlString = current URL being searched
+	protected static PrintWriter pw;			// writes to a file (mostly for testing purposes
 	private static String iface;
 	private static ArrayList<String> robots = new ArrayList<String>();
+	private static ArrayList<String> visited = new ArrayList<String>();
+
 
 	/**
 	 * Determines the proper interface for user output
@@ -50,7 +52,7 @@ public class CrHandler {
 		} else
 			normURL = userURL;
 		
-	// Print links to file
+		// Print links to file
 		try {
 			pw = new PrintWriter("./links", "UTF-8");
 		} catch (FileNotFoundException e1) {
@@ -100,13 +102,11 @@ public class CrHandler {
 			}
 			rins = rcon.getInputStream();
 		} catch (MalformedURLException e) {
-			//System.out.println("Unable to connect to robots.txt!");
 			CrHandler.printOut("Unable to connect to robots.txt!");
 			rcon = null;
 		} catch (FileNotFoundException e) {
 			rcon = null;
 		} catch (IOException e) {
-			//System.out.println("Unable to open robots.txt");
 			CrHandler.printOut("Unable to open robots.txt");
 			rcon = null;
 		}
@@ -117,14 +117,12 @@ public class CrHandler {
 			try {
 				curRobotLine = rbr.readLine();
 			} catch (IOException e1) {
-				//System.out.println("Can't read robots.txt");
 				CrHandler.printOut("Can't read robots.txt");
 			}
 			if (curRobotLine == null) { 
 				try {
 					curRobotLine = rbr.readLine();
 				} catch (IOException e) {
-					//System.out.println("Cannot read from site!");
 					CrHandler.printOut("Cannot read robots.txt from site!");
 				}
 			}
@@ -143,7 +141,6 @@ public class CrHandler {
 						try {
 							curRobotLine = rbr.readLine();
 						} catch (IOException e) {
-							//System.out.println("Lost connection to robots.txt");
 							CrHandler.printOut("Lost connection to robots.txt");
 							curRobotLine = null;
 						}
@@ -152,7 +149,6 @@ public class CrHandler {
 				try {
 					curRobotLine = rbr.readLine();
 				} catch (IOException e) {
-					//System.out.println("Connection was lost!");
 					CrHandler.printOut("Connection was lost!");
 				}
 			}
@@ -174,4 +170,85 @@ public class CrHandler {
 		}
 		return true;
 	}
+	
+	/**
+	 * Add visited URL to ArrayList
+	 * @param url URL to be added
+	 */
+	public static void addVisited(String url) {
+		visited.add(url);
+	}
+	
+	/**
+	 * Checks to see if the link has been visited or not
+	 * @param url URL to check for a prior visit
+	 * @return whether the link was visited or not.
+	 */
+	public static boolean visitedLink(String url) {
+		if (visited.contains(url)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Normalizes the URL before running all of the checks.
+	 * @param url
+	 * @return
+	 */
+	public static String normalizeUrl(String url) {
+		String result;
+		String re = "\\/.*\\/(.*)$";
+		//String linkList = visited.toString();
+		
+		if ((url.startsWith("http"))) {
+			if (!(url.startsWith("http://www")))
+					url = url.replace("http://", "http://www.");
+			if (!url.startsWith(urlString))
+				result = null;
+			else
+				result = url;
+		}
+		else if (url.contains(":"))
+			result = null;
+		else if (normURL.contains(url)) {
+			String replacement = normURL.replaceFirst("http.?:\\/\\/", "");
+			url = url.replaceFirst("^.*" + replacement, "");
+			result = normURL + url;
+		}
+		else if (url.startsWith("//")) {
+			String adder = url.replaceFirst("\\/\\/[^\\/].*?\\/", "");
+			result = normURL + "/" + adder;
+		}
+		
+		else if (url.startsWith("/"))
+			result = normURL + url;
+		// add ../ condition
+		else if (url.startsWith("../")) {
+			String adder = null;
+			while (url.contains("../")) {
+				adder = urlString.replaceFirst("(\\/[^\\/]*?)\\/[^\\/]*?$", "");
+				url = url.replaceFirst("\\.\\.", "");
+			}
+			if (url.contains("//"))
+				url = url.replaceAll("//", "/");
+			result = adder + url;
+		}
+		else if (url.startsWith("./")) {
+			url.replace(".", "");
+			result = urlString.replace(re, url);
+		} else
+			result = normURL + "/" + url;
+		if (!(result == null) && result.contains("?"))
+			result = result.replaceFirst("\\?.*", "");
+		if (!(result == null) && result.contains("#"))
+			result = result.replaceFirst("#.*", "");
+		if (!(result == null) && !(result.contains(normURL)))
+			result = null;
+		if (!(result == null) && visitedLink(result))
+			result = null;
+		return result;
+	}
+
 }
