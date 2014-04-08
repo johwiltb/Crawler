@@ -49,6 +49,8 @@ public class ConsoleCrawler {
 
 	public static void main(String[] args) throws MalformedURLException {
 
+		System.out.println();
+		System.out.println(CrHandler.loadInfo + "\n\n");
 		System.out.println("Welcome to the CLI version of EpiCrawl!\n");
 		System.out.print("URL: ");
 		urlText = input.nextLine();

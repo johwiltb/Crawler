@@ -28,6 +28,11 @@ public class CrHandler {
 	private static String iface;
 	private static ArrayList<String> robots = new ArrayList<String>();
 	private static ArrayList<String> visited = new ArrayList<String>();
+	protected static String loadInfo = "Thank you for using EpiCrawl by John Wiltberger\n\n"
+			+ "It should be noted that this program is distributed\n"
+			+ "in the hope that it will be useful, but WITHOUT\n"
+			+ "ANY WARRANTY; without even the implied warranty of\n"
+			+ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.";	
 
 
 	/**

@@ -68,16 +68,10 @@ public class EpiCrawl {
     	JPanel loadPanel = new JPanel();
     	JTextPane loadText = new JTextPane();
     	JButton loadBtn = new JButton("Ok");
-    	String loadInfo = "Thank you for using EpiCrawl by John Wiltberger\n\n"
-    			+ "It should be noted that this program is distributed\n"
-    			+ "in the hope that it will be useful, but WITHOUT\n"
-    			+ "ANY WARRANTY; without even the implied warranty of\n"
-    			+ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n"
-    			+ "You must press 'Ok' to continue...";	
     	loadPanel.setLayout(new BoxLayout(loadPanel, BoxLayout.Y_AXIS));
     	loadText.setEditable(false);
     	loadText.setBorder(new EmptyBorder(3,3,3,3));
-    	loadText.setText(loadInfo);
+    	loadText.setText(CrHandler.loadInfo + "\n\nYou must press 'Ok' to continue...");
     	loadBtn.setEnabled(false);
     	loadPanel.add(loadText);
     	loadPanel.add(loadBtn);
