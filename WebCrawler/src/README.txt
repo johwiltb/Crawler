@@ -15,6 +15,9 @@ Current information about the project as follows:
 This is because the crawler is not known as of yet, so no name is used.  
 - The crawler prints out the links visited to a file in the local directory 
 called links.  
+- Both GUI and Console are available.  To run the Console, compile the code and
+run 'java ConsoleCrawler'.  To run the GUI version, compile and run 
+'java EpiCrawl'
 
 *** FOR PROJECT 1, ONLY DEPTH LIMITED SEARCHING AND NAIVE STRING MATCHING WORKS ***
 Known Issues/Limitations:
@@ -29,7 +32,13 @@ File list:
 ./
     src/
         README.txt
-        Crawler.java
-        UserMenu.java
         BFS.java
-        DLS.java
+        ConsoleCrawler.java
+        CrHandler.java
+        DepthFirst.java
+        EpiCrawl.java
+        FiniteAutomata.java
+        KMP.java
+        LCS.java
+        NaiveString.java
+        RabinKarp.java
