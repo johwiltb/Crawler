@@ -28,15 +28,22 @@ public class CrHandler {
 	private static String iface;
 	private static ArrayList<String> robots = new ArrayList<String>();
 
-	
+	/**
+	 * Determines the proper interface for user output
+	 * @param interf Either "console" or "gui"
+	 */
 	public CrHandler(String interf) { 
 		iface = interf;
 	}
 	
+	/**
+	 * Normalizes the initial URL input
+	 * @param userURL Domain that will be searched
+	 */
 	public void normURL (String userURL) {
 		// add 'http://(www)' if it contains no header
 		if (!(userURL.contains("http"))) {
-			if (!(userURL.contains("www"))) 
+			if (!(userURL.contains("www")) && !(userURL.matches(".*?\\..*?\\..*?\\."))) 
 				normURL = "http://www." + userURL;
 			else 
 				normURL = "http://" + userURL;
@@ -54,23 +61,34 @@ public class CrHandler {
 		}
 	}
 	
+	/**
+	 * Returns normalized URL for top level domain
+	 * @return top level domain
+	 */
 	public String getURL() {
 		return normURL;
 	}
 	
+	/**
+	 * Prints output to the proper interface
+	 * @param output String to be outputted
+	 */
 	public static void printOut(String output) {
 		if (iface == "console")
 		{
 			System.out.println(output);
 		} else if (iface == "gui") {
-			EpiCrawl.resultsTxtArea.append(output);
+			EpiCrawl.resultsTxtArea.append(output + "\n");
 		} else {
 			System.out.println("Failure of output.  There is an error in your choices");
 			System.exit(1);
 		}
 	}
 	
-	public void buildRobots() {
+	/**
+	 * Builds the robots.txt information for the domain
+	 */
+	public static void buildRobots() {
 		URLConnection rcon;
 		InputStream rins = null;
 		try {
@@ -111,7 +129,7 @@ public class CrHandler {
 				}
 			}
 			while (!(curRobotLine == null)) {
-				if (curRobotLine.matches("^[ \\t]*User-Agent: \\*\\.*")) {
+				if (curRobotLine.matches("^[ \\t]*User-[aA]gent: \\*\\.*")) {
 					while (!(curRobotLine == "") && !(curRobotLine == null)) {
 						Pattern urlP = Pattern.compile("Disallow: (.*)");
 						Matcher rm = urlP.matcher(curRobotLine);
@@ -139,5 +157,21 @@ public class CrHandler {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Checks to make sure the URL is safe to traverse
+	 * @param url URL to check
+	 * @return Boolean on where it follows robots.txt policy
+	 */
+	public static Boolean robotsSafe(String url) {
+		if (!(robots == null)) {
+			for (int i = 0; i < robots.size(); i++) {
+				String reg = "^" + robots.get(i) + ".*$";
+				if (url.matches(reg))
+					return false;
+			}
+		}
+		return true;
 	}
 }

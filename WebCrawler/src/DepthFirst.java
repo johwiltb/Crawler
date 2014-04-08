@@ -25,10 +25,9 @@ public class DepthFirst {
 	private String qryString, urlString;
 	private String regex = ".*href=\"([^\"]*?)\".*";
 	private Pattern p = Pattern.compile(regex);
-	private URLConnection con = null, rcon = null;
-	private InputStream ins = null, rins = null;
-	private InputStreamReader isr = null, risr = null;
-	private static ArrayList<String> robots = new ArrayList<String>();
+	private URLConnection con = null;
+	private InputStream ins = null;
+	private InputStreamReader isr = null;
 	private static ArrayList<String> visited = new ArrayList<String>();
 	private final int CON_TIMEOUT = 4000;  		// Connection timeout (in milliseconds)
 	
@@ -45,7 +44,7 @@ public class DepthFirst {
 			CrHandler.printOut("Interruption Detected!\nThank you for using!");
 			System.exit(1);
 		}
-		currentDepth++;	
+		//currentDepth++;	
 		try {
 			URL urlSearch = new URL(this.urlString);
 			if (this.urlString.matches("^https")) {
@@ -58,17 +57,14 @@ public class DepthFirst {
 			try {
 				ins = con.getInputStream();
 			} catch (IOException e) {
-				// Error code for file
 				return;
 			}
 		} catch (MalformedURLException e) {
-			//System.out.println("Unable to connect to URL!");
 			CrHandler.printOut("Unable to connect to URL!");
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
 			return;
 		} catch (IOException e) {
-			//System.out.println("Unable to open connection");
 			CrHandler.printOut("Unable to open connection!");
 			e.printStackTrace();
 		}
@@ -79,80 +75,13 @@ public class DepthFirst {
 		try {
 			curLine = br.readLine();
 		} catch (IOException e) {
-			//System.out.println("Cannot read from site!");
 			CrHandler.printOut("Cannot read from site!");
 			System.exit(1);
 		}
 		
 		// populate robots.txt info
 		if (curDepth == dLimit) {
-			try {
-				URL robotSearch = new URL(this.urlString + "/robots.txt");
-				if (this.urlString.matches("^https.*")) {
-					rcon = (HttpsURLConnection)robotSearch.openConnection();
-				} else {
-					rcon = robotSearch.openConnection();
-				}
-				rins = rcon.getInputStream();
-			} catch (MalformedURLException e) {
-				//System.out.println("Unable to connect to robots.txt!");
-				CrHandler.printOut("Unable to connect to robots.txt!");
-				rcon = null;
-			} catch (FileNotFoundException e) {
-				rcon = null;
-			} catch (IOException e) {
-				//System.out.println("Unable to open robots.txt");
-				CrHandler.printOut("Unable to open robots.txt");
-				rcon = null;
-			}
-			if (!(rcon == null)) {
-			    risr = new InputStreamReader(rins);
-				BufferedReader rbr = new BufferedReader(risr);
-				String curRobotLine = null;
-				try {
-					curRobotLine = rbr.readLine();
-				} catch (IOException e1) {
-					//System.out.println("Can't read robots.txt");
-					CrHandler.printOut("Can't read robots.txt");
-				}
-				if (curRobotLine == null) { 
-					try {
-						curRobotLine = rbr.readLine();
-					} catch (IOException e) {
-						//System.out.println("Cannot read from site!");
-						CrHandler.printOut("Cannot read robots.txt from site!");
-					}
-				}
-				while (!(curRobotLine == null)) {
-					if (curRobotLine.matches("^[ \\t]*User-Agent: \\*\\.*")) {
-						while (!(curRobotLine == "") && !(curRobotLine == null)) {
-							Pattern urlP = Pattern.compile("Disallow: (.*)");
-							Matcher rm = urlP.matcher(curRobotLine);
-							if (rm.matches()) {
-								String adder = rm.group(1);
-								adder = adder.replaceAll("\\.", "\\\\.");
-								adder = adder.replaceAll("\\*", "\\.\\*");
-								adder = adder.replaceFirst("#.*", "");
-								robots.add(this.urlString + adder);
-							}
-							try {
-								curRobotLine = rbr.readLine();
-							} catch (IOException e) {
-								//System.out.println("Lost connection to robots.txt");
-								CrHandler.printOut("Lost connection to robots.txt");
-								curRobotLine = null;
-							}
-						}
-					}
-					try {
-						curRobotLine = rbr.readLine();
-					} catch (IOException e) {
-						//System.out.println("Connection was lost!");
-						CrHandler.printOut("Connection was lost!");
-					}
-				}
-			}
-			
+			CrHandler.buildRobots();
 		}
 		// check to make sure the depth hasn't hit its minimum
 		if ( curDepth >= 0 )
@@ -174,21 +103,17 @@ public class DepthFirst {
 							String urlStr = m.group(1);
 							fullStr = normalizeUrl(urlStr);
 							if (!(fullStr == null)) {
-								if (robotSafe(fullStr)) {
+								if (CrHandler.robotsSafe(fullStr)) {
 									CrHandler.pw.println(fullStr);
-									//links.add(fullStr);
+									links.add(fullStr);
 									visited.add(fullStr);
-									//testing
-									DepthFirst next = new DepthFirst(fullStr, this.depthLimit, currentDepth - 1, this.stringMatch, this.qryString);
 								}
 							}
 						}
 					}	
-					// For matching the search query, deal with later
 					NaiveString nss = new NaiveString(this.qryString, curLine);
 					String queryMatch = nss.matches();
 					if (!(queryMatch == null) && !(fullStr == null))
-						//System.out.println(fullStr);
 						CrHandler.printOut(fullStr);
 					break;
 				case 2:
@@ -201,7 +126,6 @@ public class DepthFirst {
 					//KMP
 					break;
 				default:
-					//System.out.println("Incorrect String matching algorithm selected!");
 					CrHandler.printOut("Incorrect String matching algorithm selected!");
 					System.exit(1);
 					break;
@@ -209,18 +133,17 @@ public class DepthFirst {
 				try {
 					curLine = br.readLine();
 				} catch (IOException e) {
-					//System.out.println("Cannot read from site!");
 					CrHandler.printOut("Cannot read from site!");
 					System.exit(1);
 				}
 			}
 			
 			// TEST to make sure the algorithm is going recursively
-			//System.out.println("The current depth is: " + (4 - currentDepth));
-			//for (int i = 0; i < links.size(); i++) {
-				//DepthFirst next = new DepthFirst(this.links.get(i), this.depthLimit, currentDepth - 1, this.stringMatch, this.qryString);
-				//currentDepth++;
-			//}
+			//CrHandler.printOut("The current depth is: " + (4 - currentDepth));
+			for (int i = 0; i < links.size(); i++) {
+				new DepthFirst(this.links.get(i), this.depthLimit, currentDepth - 1, this.stringMatch, this.qryString);
+				currentDepth++;
+			}
 		}
 	}
 	
@@ -244,8 +167,11 @@ public class DepthFirst {
 		}
 		else if (url.contains(":"))
 			result = null;
-		
-		// Not working correctly yet
+		else if (CrHandler.normURL.contains(url)) {
+			String replacement = CrHandler.normURL.replaceFirst("http.?:\\/\\/", "");
+			url = url.replaceFirst("^.*" + replacement, "");
+			result = CrHandler.normURL + url;
+		}
 		else if (url.startsWith("//")) {
 			String adder = url.replaceFirst("\\/\\/[^\\/].*?\\/", "");
 			result = CrHandler.normURL + "/" + adder;
@@ -281,21 +207,4 @@ public class DepthFirst {
 		}
 		return result;
 	}
-	
-	/**
-	 * Checks to make sure the URL is safe to traverse
-	 * @param url URL to check
-	 * @return Boolean on where it follows robots.txt policy
-	 */
-	public boolean robotSafe(String url) {
-		if (!(robots == null)) {
-			for (int i = 0; i < robots.size(); i++) {
-				String reg = "^" + robots.get(i) + ".*$";
-				if (url.matches(reg))
-					return false;
-			}
-		}
-		return true;
-	}
-
 }

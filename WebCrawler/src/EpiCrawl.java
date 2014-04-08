@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -12,6 +13,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
 
 /**
  * @author John Wiltberger
@@ -45,18 +48,52 @@ public class EpiCrawl {
     private JPanel btnPanel = new JPanel();
     
     // Used to print out results
-    protected static JTextArea resultsTxtArea = new JTextArea("Results displayed below:");
-    private JScrollPane resultScrollBx = new JScrollPane(resultsTxtArea);
+    protected static JTextArea resultsTxtArea = new JTextArea("Results displayed below:\n");
+    protected static JScrollPane resultScrollBx = new JScrollPane(resultsTxtArea);
+    private JPanel resultPanel = new JPanel();
+    protected static JFrame resultFrame = new JFrame();
 
-    public EpiCrawl() { }
-    
+    public EpiCrawl() {
+		  resultScrollBx.setPreferredSize(new Dimension(480,300));
+		  resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
+		  resultPanel.add(resultScrollBx);
+		  resultFrame.add(resultPanel);
+		  resultFrame.pack();
+		  resultFrame.setLocationRelativeTo(null);
+    }
+    	
     public void buildMenu() {
+    	// Set up a loading frame
+    	final JFrame loadFrame = new JFrame();
+    	JPanel loadPanel = new JPanel();
+    	JTextPane loadText = new JTextPane();
+    	JButton loadBtn = new JButton("Ok");
+    	String loadInfo = "Thank you for using EpiCrawl by John Wiltberger\n\n"
+    			+ "It should be noted that this program is distributed\n"
+    			+ "in the hope that it will be useful, but WITHOUT\n"
+    			+ "ANY WARRANTY; without even the implied warranty of\n"
+    			+ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n"
+    			+ "You must press 'Ok' to continue...";
+    	
+    	loadPanel.setLayout(new BoxLayout(loadPanel, BoxLayout.Y_AXIS));
+    	loadText.setEditable(false);
+    	loadText.setBorder(new EmptyBorder(3,3,3,3));
+    	loadText.setText(loadInfo);
+    	loadBtn.setEnabled(false);
+    	loadPanel.add(loadText);
+    	loadPanel.add(loadBtn);
+    	loadFrame.add(loadPanel);
+    	loadFrame.getRootPane().setDefaultButton(loadBtn);
+    	loadFrame.pack();
+    	loadFrame.setLocationRelativeTo(null);
+    	loadFrame.setVisible(true);
+    	
+    	// Build Main Menu
     	resultsTxtArea.setEnabled(false);
     	resultsTxtArea.setEditable(true);
     	// Set default behaviors of the panels and frames
     	mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     	mainFrame.setTitle("EpiCrawl");
-    	mainFrame.setLocationRelativeTo(null);
     	
     	mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
     	searchParamsPanel.setLayout(new BoxLayout(searchParamsPanel, BoxLayout.X_AXIS));
@@ -121,12 +158,14 @@ public class EpiCrawl {
     	
     	// Create Buttons for search
     	JButton goBtn = new JButton("Go");
-        JButton stopBtn = new JButton("Stop");
     	goBtn.setEnabled(true);    	
-        stopBtn.setEnabled(true);
         
         goBtn.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
+        		//resultFrame.setVisible(true);
+        		//resultPanel.setVisible(true);
+        		//resultScrollBx.setVisible(true);
+        		//stopBtn.setVisible(true);
         		algSearch = searchTypeCmbBx.getSelectedIndex();
         		algString = strMatchCmbBx.getSelectedIndex();
         		searchURL = urlTxtFld.getText();
@@ -136,28 +175,31 @@ public class EpiCrawl {
         	}
         });
         
-        stopBtn.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		stopPressed = true;
-        	}
-        });
-        
         btnPanel.add(goBtn);
-        btnPanel.add(stopBtn);
         
     	// Add all the separate panels to the main panel
     	mainPanel.add(searchParamsPanel);
     	mainPanel.add(urlPanel);
     	mainPanel.add(qryPanel);
     	mainPanel.add(btnPanel);
+    	mainPanel.add(resultPanel);
     	// Add all the panels to the GUI and make it visible
     	mainFrame.add(mainPanel, BorderLayout.CENTER);
     	mainFrame.getRootPane().setDefaultButton(goBtn);
     	mainFrame.pack();
-    	mainFrame.setVisible(true);
+    	mainFrame.setLocationRelativeTo(null);
+    	loadBtn.setEnabled(true);
+    	loadBtn.addActionListener(new ActionListener() {
+    		public void actionPerformed(ActionEvent e) {
+    	    	mainFrame.setVisible(true);
+      	    	loadFrame.dispose();
+    		}
+    	});
     }
     
-    
+    /**
+     * Handles the procedures once 'Go' has been pressed
+     */
     public void pressGo() {
     	try {
 			modifier = Integer.parseInt(strMod);
@@ -165,22 +207,25 @@ public class EpiCrawl {
 			JOptionPane.showMessageDialog(null, "Only integers in the 'Max Search' field!");
 			return;
 		}
+    	if (searchURL.isEmpty() || searchText.isEmpty()) {
+    		JOptionPane.showMessageDialog(null, "Please fill out all query boxes!");
+    		return;
+    	}
     	CrHandler handle = new CrHandler("gui");
     	handle.normURL(searchURL);
     	searchURL = handle.getURL();
-    	resultScrollBx.setVisible(true);
+    	
     	
     	if (this.algSearch == 0) {
         	BFS search = new BFS(this.searchURL, this.searchText, this.algString);
         	search.search();
         } else if (this.algSearch == 1) {
-        	DepthFirst search = new DepthFirst(this.searchURL, this.modifier, this.modifier, this.algString, this.searchText);
+        	//DepthFirst search = new DepthFirst(this.searchURL, this.modifier, this.modifier, this.algString, this.searchText);
+        	new DepthFirst(this.searchURL, this.modifier, this.modifier, this.algString, this.searchText);
         	CrHandler.pw.close();
         	resultsTxtArea.append("All Finished!");
-        	//System.out.println("All Finished!");
         } else {
         	resultsTxtArea.append("There was an issue in the choice of Search Algorithms");
-        	//System.out.println("There was an issue in the choice of Search Algorithms");
         	System.exit(1);
         }
 	}

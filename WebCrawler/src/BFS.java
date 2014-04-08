@@ -54,7 +54,7 @@ public class BFS {
 					con = urlSearch.openConnection();
 				}
 				// Hehe, look like a real web browser
-				con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0");
+				con.setRequestProperty("User-Agent", "EpiCrawl v1.0");
 				ins = con.getInputStream();
 			    isr = new InputStreamReader(ins);
 			} catch (MalformedURLException e1) {
@@ -234,6 +234,6 @@ public class BFS {
 	 * @return whether searching is running or not
 	 */
 	public boolean isSearching() {
-		return !(UserMenu.stopPressed);
+		return true;
 	}
 }
