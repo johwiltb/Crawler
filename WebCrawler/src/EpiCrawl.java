@@ -155,10 +155,6 @@ public class EpiCrawl {
         
         goBtn.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		//resultFrame.setVisible(true);
-        		//resultPanel.setVisible(true);
-        		//resultScrollBx.setVisible(true);
-        		//stopBtn.setVisible(true);
         		algSearch = searchTypeCmbBx.getSelectedIndex();
         		algString = strMatchCmbBx.getSelectedIndex();
         		searchURL = urlTxtFld.getText();
@@ -176,6 +172,7 @@ public class EpiCrawl {
     	mainPanel.add(qryPanel);
     	mainPanel.add(btnPanel);
     	mainPanel.add(resultPanel);
+    	
     	// Add all the panels to the GUI and make it visible
     	mainFrame.add(mainPanel, BorderLayout.CENTER);
     	mainFrame.getRootPane().setDefaultButton(goBtn);
@@ -214,7 +211,6 @@ public class EpiCrawl {
         	BFS search = new BFS(this.searchURL, this.searchText, this.algString);
         	search.search();
         } else if (this.algSearch == 1) {
-        	//DepthFirst search = new DepthFirst(this.searchURL, this.modifier, this.modifier, this.algString, this.searchText);
         	new DepthFirst(this.searchURL, this.modifier, this.modifier, this.algString, this.searchText);
         	CrHandler.pw.close();
         	resultsTxtArea.append("All Finished!");
