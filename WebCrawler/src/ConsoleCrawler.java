@@ -36,12 +36,13 @@
  *  - Parallelization (how to coordinate distributed web crawlers) **May not apply
  */
 import java.net.MalformedURLException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class ConsoleCrawler {
-	private static final int MAX_DEPTH_LIMIT = 4;
+	private static int optionalNum;
 	protected static String urlText;
-	private static String queryText;
+	private static String queryText, temp;
 	private static int searchType, stringType;
 	private static Scanner input = new Scanner(System.in);	
 		
@@ -54,27 +55,46 @@ public class ConsoleCrawler {
 		CrHandler handle = new CrHandler("console");
 		handle.normURL(urlText);
 		urlText = handle.getURL();
-		
-		System.out.print("queryText: ");
-		queryText = input.nextLine();
-		System.out.print("Choose your Search type\n(1): DLS\n(2): BFS\nChoice: ");
-		searchType = input.nextInt();
-		while(searchType < 1 || searchType > 2) {
-			System.out.print("Invalid response. Please choose '1' or '2': ");
+		try {
+			System.out.print("queryText: ");
+			queryText = input.nextLine();
+			System.out.print("Choose your Search type\n(1): DLS\n(2): BFS\nChoice: ");
 			searchType = input.nextInt();
-		}
-		System.out.print("Choose you String Matching Algorithm\n(1): Longest Common Sequence\n(2): Naive String Matching"
-				+ "\n(3): Rabin-Karp\n(4): Finite Automata\n(5): KMP\nChoice: ");
-		stringType = input.nextInt();
-		while(stringType < 1 || stringType > 5) {
-			System.out.print("Invalid response. Please choose '1-5': ");
+			while(searchType < 1 || searchType > 2) {
+				System.out.print("Invalid response. Please choose '1' or '2': ");
+				searchType = input.nextInt();
+			}
+			if (searchType == 1) {
+				System.out.print("How many levels would you like to search? ");
+				optionalNum = input.nextInt();
+				if (optionalNum < 1) {
+					System.out.println("You entered a value too small.  Setting to 4.");
+					optionalNum = 4;
+				}
+			} else {
+				System.out.print("How many pages would you like to search? ");
+				optionalNum = input.nextInt();
+				if (optionalNum < 1) {
+					System.out.println("You entered a value too small.  Setting to 200.");
+					optionalNum = 200;
+				}
+			}
+			System.out.print("Choose you String Matching Algorithm\n(1): Longest Common Sequence\n(2): Naive String Matching"
+					+ "\n(3): Rabin-Karp\n(4): Finite Automata\n(5): KMP\nChoice: ");
 			stringType = input.nextInt();
+			while(stringType < 1 || stringType > 5) {
+				System.out.print("Invalid response. Please choose '1-5': ");
+				stringType = input.nextInt();
+			}
+		} catch (InputMismatchException e) {
+			System.out.println("\n****You inputted an illegal character!  Try \nrunning the program again with appropriate parameters!");
+			System.exit(1);
 		}
 		
 		switch(searchType) {
 			case 1:
 				System.out.println("Results will be printed below:\n");
-				new DepthFirst(getUrl(), MAX_DEPTH_LIMIT, MAX_DEPTH_LIMIT, getStringType() - 1, queryText);
+				new DepthFirst(getUrl(), optionalNum, optionalNum, getStringType() - 1, queryText);
 				break;
 			case 2:
 				BFS bfs = new BFS(urlText, queryText, (stringType-1));
@@ -94,5 +114,4 @@ public class ConsoleCrawler {
 	private static String getUrl() {
 		return urlText;
 	}
-
 }
