@@ -205,12 +205,18 @@ public class CrHandler {
 	public static String normalizeUrl(String url) {
 		String result;
 		String re = "\\/.*\\/(.*)$";
-		//String linkList = visited.toString();
 		
-		if ((url.startsWith("http"))) {
+		if ((url.startsWith("https"))) {
+			if (!(url.startsWith("https://www")))
+					url = url.replace("https://", "https://www.");
+			if (!(url.startsWith(normURL)))
+				result = null;
+			else
+				result = url;
+		} else if ((url.startsWith("http:"))) {
 			if (!(url.startsWith("http://www")))
 					url = url.replace("http://", "http://www.");
-			if (!url.startsWith(urlString))
+			if (!(url.startsWith(normURL)))
 				result = null;
 			else
 				result = url;
@@ -226,14 +232,12 @@ public class CrHandler {
 			String adder = url.replaceFirst("\\/\\/[^\\/].*?\\/", "");
 			result = normURL + "/" + adder;
 		}
-		
 		else if (url.startsWith("/"))
 			result = normURL + url;
-		// add ../ condition
 		else if (url.startsWith("../")) {
 			String adder = null;
 			while (url.contains("../")) {
-				adder = urlString.replaceFirst("(\\/[^\\/]*?)\\/[^\\/]*?$", "");
+				adder = normURL.replaceFirst("(\\/[^\\/]*?)\\/[^\\/]*?$", "");
 				url = url.replaceFirst("\\.\\.", "");
 			}
 			if (url.contains("//"))
@@ -242,7 +246,7 @@ public class CrHandler {
 		}
 		else if (url.startsWith("./")) {
 			url.replace(".", "");
-			result = urlString.replace(re, url);
+			result = normURL.replace(re, url);
 		} else
 			result = normURL + "/" + url;
 		if (!(result == null) && result.contains("?"))

@@ -22,7 +22,7 @@ public class DepthFirst {
 	private ArrayList<String> links = new ArrayList<String>();
 	private int depthLimit, stringMatch;
 	private static int currentDepth;
-	private String qryString;
+	private String qryString, urlString;
 	private String regex = ".*href=\"([^\"]*?)\".*";
 	private Pattern p = Pattern.compile(regex);
 	private URLConnection con = null;
@@ -35,15 +35,15 @@ public class DepthFirst {
 		currentDepth = curDepth;
 		this.stringMatch = strMatch;
 		this.qryString = query;
-		CrHandler.urlString = url;
+		this.urlString = url;
 		
 		if (EpiCrawl.stopPressed) {
 			CrHandler.printOut("Interruption Detected!\nThank you for using!");
 			System.exit(1);
 		}	
 		try {
-			URL urlSearch = new URL(CrHandler.urlString);
-			if (CrHandler.urlString.matches("^https")) {
+			URL urlSearch = new URL(this.urlString);
+			if (this.urlString.matches("^https")) {
 				con = (HttpsURLConnection)urlSearch.openConnection();
 			} else {
 				con = urlSearch.openConnection();
@@ -80,7 +80,7 @@ public class DepthFirst {
 			CrHandler.buildRobots();
 		}
 		// check to make sure the depth hasn't hit its minimum
-		if ( curDepth >= 0 )
+		if ( curDepth > 0 )
 		{
 			// string matching here
 			while(curLine != null) {
