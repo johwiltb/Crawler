@@ -19,10 +19,11 @@ public class NaiveString {
 		this.setfLine(fullLine);
 	}
 	
-	public void test() {
-		System.out.println("Naive String works");
-	}
 	
+	/**
+	 * Matches the current string with the pattern and returns the result
+	 * @return matching string (if matches) or null (if no match found)
+	 */
 	public String matches() {
 		int qTextLen = this.getqText().length();
 		int fLineLen = this.getfLine().length();

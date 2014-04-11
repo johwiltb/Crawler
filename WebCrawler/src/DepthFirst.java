@@ -1,9 +1,9 @@
 /**
+ * DepthFirst.java
  * @author John Wiltberger
- *
+ * This class handles the Depth Limited Searching algorithm for
+ * the web crawler (even though it is called DepthFirst.java).  
  */
-
-// Note on regex, the code for parsing out the URL from a string was found here: http://blog.houen.net/java-get-url-from-string/
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -19,28 +19,38 @@ import java.util.regex.Pattern;
 import javax.net.ssl.HttpsURLConnection;
 
 public class DepthFirst {
-	private ArrayList<String> links = new ArrayList<String>();
+	private ArrayList<String> links = new ArrayList<String>();	// Store links to be visited
 	private int depthLimit, stringMatch;
-	private static int currentDepth;
+	private static int currentDepth;							// Keeps track of the current depth
 	private String qryString, urlString;
-	private String regex = ".*href=\"([^\"]*?)\".*";
+	private String regex = ".*href=\"([^\"]*?)\".*";		// Matches for the 'href=' attribute
 	private Pattern p = Pattern.compile(regex);
 	private URLConnection con = null;
 	private InputStream ins = null;
 	private InputStreamReader isr = null;
 	private final int CON_TIMEOUT = 4000;  		// Connection timeout (in milliseconds)
 	
+	/**
+	 * Constructor for Depth First class (this is recursive)
+	 * @param url URL string that will be searched
+	 * @param dLimit the limit set for the depth of the search
+	 * @param curDepth the current depth of the search
+	 * @param strMatch the string that is getting matched
+	 * @param query the string that is getting matched
+	 */
 	public DepthFirst(String url, int dLimit, int curDepth, int strMatch, String query) {
 		this.depthLimit = dLimit;
 		currentDepth = curDepth;
 		this.stringMatch = strMatch;
 		this.qryString = query;
 		this.urlString = url;
-		
+		/* Not currently working
 		if (EpiCrawl.stopPressed) {
 			CrHandler.printOut("Interruption Detected!\nThank you for using!");
 			System.exit(1);
-		}	
+		}	*/
+		
+		// Attempt to open the connection
 		try {
 			URL urlSearch = new URL(this.urlString);
 			if (this.urlString.matches("^https")) {
@@ -65,6 +75,7 @@ public class DepthFirst {
 			e.printStackTrace();
 		}
 		
+		// Begin reading from the site
 	    this.isr = new InputStreamReader(ins);
 		BufferedReader br = new BufferedReader(this.isr);
 		String curLine = null;
@@ -90,6 +101,8 @@ public class DepthFirst {
 					break;
 				case 1:
 					//Naive String
+					
+					// First check the site for the links and populate the links array
 					NaiveString nsURL = new NaiveString("href=", curLine);
 					String result = nsURL.matches();
 					String fullStr = null;
@@ -107,6 +120,8 @@ public class DepthFirst {
 							}
 						}
 					}	
+					
+					// Match the query string
 					NaiveString nss = new NaiveString(this.qryString, curLine);
 					String queryMatch = nss.matches();
 					if (!(queryMatch == null) && !(fullStr == null))
@@ -126,6 +141,8 @@ public class DepthFirst {
 					System.exit(1);
 					break;
 				}
+				
+				// Read the next line after the match
 				try {
 					curLine = br.readLine();
 				} catch (IOException e) {
@@ -133,6 +150,8 @@ public class DepthFirst {
 					System.exit(1);
 				}
 			}
+			
+			// Search through the links that were populated (recursive part of the class)
 			for (int i = 0; i < links.size(); i++) {
 				new DepthFirst(this.links.get(i), this.depthLimit, currentDepth - 1, this.stringMatch, this.qryString);
 				currentDepth++;

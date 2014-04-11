@@ -40,23 +40,25 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class ConsoleCrawler {
-	private static int optionalNum;
-	protected static String urlText;
-	private static String queryText;
-	private static int searchType, stringType;
-	private static Scanner input = new Scanner(System.in);	
+	private static int optionalNum;		// Parameter for either depth or max pages to search
+	protected static String urlText;	// Domain to search
+	private static String queryText;	// String to search for
+	private static int searchType, stringType;		// Determines both the searching and string matching algorithms
+	private static Scanner input = new Scanner(System.in);	// Read user input
 		
-
+	
 	public static void main(String[] args) throws MalformedURLException {
-
+		// Begin console printing
 		System.out.println();
-		System.out.println(CrHandler.loadInfo + "\n\n");
+		System.out.println(CrHandler.loadInfo + "\n\n");		// Print warning to user
 		System.out.println("Welcome to the CLI version of EpiCrawl!\n");
 		System.out.print("URL: ");
-		urlText = input.nextLine();
-		CrHandler handle = new CrHandler("console");
+		urlText = input.nextLine();		// Input for url search
+		CrHandler handle = new CrHandler("console");	// Begins handler with the console settings
 		handle.normURL(urlText);
 		urlText = handle.getURL();
+		
+		// Populates variables and checks for valid input
 		try {
 			System.out.print("queryText: ");
 			queryText = input.nextLine();
@@ -93,6 +95,7 @@ public class ConsoleCrawler {
 			System.exit(1);
 		}
 		
+		// Begins search based off of search choice
 		switch(searchType) {
 			case 1:
 				System.out.println("Results will be printed below:\n");
@@ -109,10 +112,18 @@ public class ConsoleCrawler {
 		System.out.println("\nThank you for using this!");
 	}
 
+	/**
+	 * Get the string matching algorithm type
+	 * @return integer matching string type
+	 */
 	private static int getStringType() {
 		return stringType;
 	}
 
+	/**
+	 * Get the domain to be searched
+	 * @return string version of the domain to be searched
+	 */
 	private static String getUrl() {
 		return urlText;
 	}

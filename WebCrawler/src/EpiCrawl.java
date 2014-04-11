@@ -17,6 +17,7 @@ import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 
 /**
+ * EpiCrawl.java
  * @author John Wiltberger
  * @date 25 Feb 2014
  * Class sets up User's GUI Menu to allow the user to select individual searching algorithms,
@@ -26,7 +27,7 @@ import javax.swing.border.EmptyBorder;
 public class EpiCrawl {
 	private int algSearch, algString;		// Holds choices for search algorithm and string matching algorithm
 	private String searchURL, searchText;	// Holds the user's URL choice and query text
-    protected static boolean stopPressed = false; 	// Stops the searching
+    //protected static boolean stopPressed = false; 	// Stops the searching
     private int modifier;					// Determine either max pages or max depth, depending on value
     private String strMod;
 	
@@ -53,15 +54,22 @@ public class EpiCrawl {
     private JPanel resultPanel = new JPanel();
     protected static JFrame resultFrame = new JFrame();
 
+    /**
+     * Constructor for the EpiCrawl class
+     */
     public EpiCrawl() {
-		  resultScrollBx.setPreferredSize(new Dimension(480,300));
-		  resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
-		  resultPanel.add(resultScrollBx);
-		  resultFrame.add(resultPanel);
-		  resultFrame.pack();
-		  resultFrame.setLocationRelativeTo(null);
+    	// Sets up the results panel for displaying links
+		resultScrollBx.setPreferredSize(new Dimension(480,300));
+		resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
+		resultPanel.add(resultScrollBx);
+		resultFrame.add(resultPanel);
+		resultFrame.pack();
+		resultFrame.setLocationRelativeTo(null);
     }
     	
+    /**
+     * Builds and displays the main user interface for the class
+     */
     public void buildMenu() {
     	// Set up a loading frame
     	final JFrame loadFrame = new JFrame();
@@ -115,6 +123,7 @@ public class EpiCrawl {
     	
     	DfxtraSrchParamsLbl.setVisible(false);
     	
+    	// Displays the different types of extra search paramaters per search choice
     	searchTypeCmbBx.addActionListener(new ActionListener() {
     		public void actionPerformed(ActionEvent event) {
     			DfxtraSrchParamsLbl.setVisible(!(DfxtraSrchParamsLbl.isVisible()));
@@ -153,6 +162,7 @@ public class EpiCrawl {
     	JButton goBtn = new JButton("Go");
     	goBtn.setEnabled(true);    	
         
+    	// goBtn listener that sets the private variables once the user chooses them
         goBtn.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		algSearch = searchTypeCmbBx.getSelectedIndex();
@@ -191,22 +201,27 @@ public class EpiCrawl {
      * Handles the procedures once 'Go' has been pressed
      */
     public void pressGo() {
+    	// Verify integer in extra string parameters
     	try {
 			modifier = Integer.parseInt(strMod);
 		} catch (Exception e1) {
 			JOptionPane.showMessageDialog(null, "Only integers in the 'Max Search' field!");
 			return;
 		}
+    	
+    	// Verify that the search fields are not empty
     	if (searchURL.isEmpty() || searchText.isEmpty()) {
     		JOptionPane.showMessageDialog(null, "Please fill out all query boxes!");
     		return;
     	}
+    	
+    	// Initiate the text in the results panel
     	resultsTxtArea.setText("Results displayed below:\n");
     	CrHandler handle = new CrHandler("gui");
     	handle.normURL(searchURL);
     	searchURL = handle.getURL();
     	
-    	
+    	// Sets up the search algorithm
     	if (this.algSearch == 0) {
         	BFS search = new BFS(this.searchURL, this.searchText, this.algString);
         	search.search();

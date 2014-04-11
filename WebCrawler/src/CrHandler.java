@@ -24,10 +24,12 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class CrHandler {
 	protected static String normURL, urlString; // normURL = domain being searched, urlString = current URL being searched
-	protected static PrintWriter pw;			// writes to a file (mostly for testing purposes
-	private static String iface;
-	private static ArrayList<String> robots = new ArrayList<String>();
-	private static ArrayList<String> visited = new ArrayList<String>();
+	protected static PrintWriter pw;			// writes to a file (mostly for testing purposes)
+	private static String iface;				// handles whether the crawler is in console or GUI mode
+	private static ArrayList<String> robots = new ArrayList<String>();	// Stores robots.txt information
+	private static ArrayList<String> visited = new ArrayList<String>(); // Stores links that have been visited
+	
+	// Store necessary warning
 	protected static String loadInfo = "Thank you for using EpiCrawl by John Wiltberger\n\n"
 			+ "It should be noted that this program is distributed\n"
 			+ "in the hope that it will be useful, but WITHOUT\n"
@@ -98,6 +100,8 @@ public class CrHandler {
 	public static void buildRobots() {
 		URLConnection rcon;
 		InputStream rins = null;
+		
+		// Attempts connection to the robots.txt page
 		try {
 			URL robotSearch = new URL(CrHandler.normURL + "/robots.txt");
 			if (CrHandler.normURL.matches("^https.*")) {
@@ -115,6 +119,8 @@ public class CrHandler {
 			CrHandler.printOut("Unable to open robots.txt");
 			rcon = null;
 		}
+		
+		// Reads and populates robots.txt
 		if (!(rcon == null)) {
 		    InputStreamReader risr = new InputStreamReader(rins);
 			BufferedReader rbr = new BufferedReader(risr);
@@ -199,13 +205,14 @@ public class CrHandler {
 	
 	/**
 	 * Normalizes the URL before running all of the checks.
-	 * @param url
-	 * @return
+	 * @param url URL to be normalized
+	 * @return normalized URL (or null if it doesn't match requirements)
 	 */
 	public static String normalizeUrl(String url) {
 		String result;
 		String re = "\\/.*\\/(.*)$";
 		
+		// Check for full links (non-relative)
 		if ((url.startsWith("https"))) {
 			if (!(url.startsWith("https://www")))
 					url = url.replace("https://", "https://www.");
@@ -220,20 +227,25 @@ public class CrHandler {
 				result = null;
 			else
 				result = url;
-		}
-		else if (url.contains(":"))
+		} else if (url.contains(":"))
 			result = null;
 		else if (normURL.contains(url)) {
 			String replacement = normURL.replaceFirst("http.?:\\/\\/", "");
 			url = url.replaceFirst("^.*" + replacement, "");
 			result = normURL + url;
 		}
+		
+		// Checks for links beginning with '//' (and not from http(s)://)
 		else if (url.startsWith("//")) {
 			String adder = url.replaceFirst("\\/\\/[^\\/].*?\\/", "");
 			result = normURL + "/" + adder;
 		}
+		
+		// Relative links that begin '/' i.e. /page.html
 		else if (url.startsWith("/"))
 			result = normURL + url;
+		
+		// Relative links that begin '../' i.e. ../calendar.html
 		else if (url.startsWith("../")) {
 			String adder = null;
 			while (url.contains("../")) {
@@ -244,17 +256,27 @@ public class CrHandler {
 				url = url.replaceAll("//", "/");
 			result = adder + url;
 		}
+		
+		// Relative links that begin './' i.e. ./fun.html
 		else if (url.startsWith("./")) {
 			url.replace(".", "");
 			result = normURL.replace(re, url);
 		} else
 			result = normURL + "/" + url;
+		
+		// Remove additional url parameters (as in php variables)
 		if (!(result == null) && result.contains("?"))
 			result = result.replaceFirst("\\?.*", "");
+		
+		// Remove links to locations on a page
 		if (!(result == null) && result.contains("#"))
 			result = result.replaceFirst("#.*", "");
+		
+		// Remove links that are outside of the scope
 		if (!(result == null) && !(result.contains(normURL)))
 			result = null;
+		
+		// Remove links that have already been visited
 		if (!(result == null) && visitedLink(result))
 			result = null;
 		return result;
