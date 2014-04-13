@@ -28,6 +28,7 @@ public class DepthFirst {
 	private URLConnection con = null;
 	private InputStream ins = null;
 	private InputStreamReader isr = null;
+	private boolean containedQuery = false;					// Determines if the query has been found on the page
 	private final int CON_TIMEOUT = 4000;  		// Connection timeout (in milliseconds)
 	
 	/**
@@ -121,12 +122,16 @@ public class DepthFirst {
 						}
 					}	
 					
-					// Match the query string
-					NaiveString nss = new NaiveString(this.qryString, curLine);
-					String queryMatch = nss.matches();
-					if (!(queryMatch == null) && !(fullStr == null))
-						CrHandler.printOut(fullStr);
-					break;
+					// Only run string matching if the query hasn't been found on this site
+					//if (!(this.containedQuery)) {
+						// Match the query string
+						NaiveString nss = new NaiveString(this.qryString, curLine);
+						String queryMatch = nss.matches();
+						if (!(queryMatch == null) && !(fullStr == null))
+							CrHandler.printOut(fullStr);
+						//	this.containedQuery = true;
+						break;
+					//}
 				case 2:
 					//Rabin-Karp
 					break;
