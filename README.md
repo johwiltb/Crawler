@@ -1,6 +1,4 @@
 Johnathan Wiltberger
-Foundations of Algorithms
-Homework Assignment 3
 
 *All programming done on Mac OSX Mavericks*
 
