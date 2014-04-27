@@ -90,8 +90,8 @@ public class EpiCrawl {
     	loadFrame.setVisible(true);
     	
     	// Build Main Menu
-    	resultsTxtArea.setEnabled(false);
-    	resultsTxtArea.setEditable(true);
+    	resultsTxtArea.setEnabled(true);
+    	resultsTxtArea.setEditable(false);
     	
     	// Set default behaviors of the panels and frames
     	mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -7,7 +7,7 @@
  */
 
 public class LCS {
-	
+	private String matchStr = "";
 	public LCS() {
 		
 	}
@@ -19,22 +19,35 @@ public class LCS {
 	public String match(String query, String fullLine){
 	    int qTextLen = query.length();
 	    int fLineLen = fullLine.length();
+	    int[][] opt = new int [qTextLen + 1][fLineLen+1];
+	    
 	    if(qTextLen == 0 || fLineLen == 0){
 	        return null;
-	    }else if(query.charAt(qTextLen-1) == fullLine.charAt(fLineLen-1)){
-	        return match(query.substring(0,qTextLen-1),fullLine.substring(0,fLineLen-1))
-	            + query.charAt(qTextLen-1);
-	    }else{
-	        String a = match(query, fullLine.substring(0,fLineLen-1));
-	        String b = match(query.substring(0,qTextLen-1), fullLine);
-	        while ((a != null) && (b != null) && (a.length() > 3) && (b.length() > 3)) {
-		        if (a.length() > b.length())
-		        	return a;
-		        else
-		        	return b;
-	        }
-	        return null;
-	        //return (a.length() > b.length()) ? a : b;
 	    }
+	    
+	    // Build the table
+	    for (int i = qTextLen - 1; i >= 0; i--) {
+	    	for (int j = fLineLen - 1; j >=0; j--) {
+	    		if (query.charAt(i) == fullLine.charAt(j))
+	    			opt[i][j] = opt[i+1][j+1] + 1;
+	    		else
+	    			opt[i][j] = Math.max(opt[i+1][j], opt[i][j+1]);
+	    	}
+	    }
+	    
+	    // Return the string
+	    int i = 0, j = 0;
+	    while( i < qTextLen && j < fLineLen) {
+	    	if (query.charAt(i) == fullLine.charAt(j)) {
+	    		matchStr = matchStr + query.charAt(i);
+	    		i++;
+	    		j++;
+	    	} else if (opt[i+1][j] >= opt[i][j+1]) 
+	    		i++;
+	    	else
+	    		j++;
+	    }
+	    
+	    return matchStr;
 	}
 }

@@ -30,6 +30,7 @@ public class DepthFirst {
 	private InputStreamReader isr = null;
 	private boolean containedQuery = false;					// Determines if the query has been found on the page
 	private final int CON_TIMEOUT = 4000;  		// Connection timeout (in milliseconds)
+	private double matchMin = 1;								// Sets the minimum characters that must match in the query
 	
 	/**
 	 * Constructor for Depth First class (this is recursive)
@@ -45,11 +46,7 @@ public class DepthFirst {
 		this.stringMatch = strMatch;
 		this.qryString = query;
 		this.urlString = url;
-		/* Not currently working
-		if (EpiCrawl.stopPressed) {
-			CrHandler.printOut("Interruption Detected!\nThank you for using!");
-			System.exit(1);
-		}	*/
+		this.matchMin = Math.floor(this.qryString.length() * 0.6);
 		
 		// Attempt to open the connection
 		try {
@@ -99,6 +96,31 @@ public class DepthFirst {
 				switch(strMatch) {
 				case 0:
 					//LCS
+					
+					// First check the site for the links and populate the links array
+					NaiveString lcsURL = new NaiveString("href=", curLine);
+					String lcsresult = lcsURL.matches();
+					String lcsfullStr = null;
+					if (lcsresult != null) {
+						Matcher m = p.matcher(lcsresult);
+						if (m.matches()) {
+							String urlStr = m.group(1);
+							lcsfullStr = CrHandler.normalizeUrl(urlStr);
+							if (!(lcsfullStr == null)) {
+								if (CrHandler.robotsSafe(lcsfullStr)) {
+									CrHandler.pw.println(lcsfullStr);
+									links.add(lcsfullStr);
+									CrHandler.addVisited(lcsfullStr);
+								}
+							}
+						}
+					}
+					
+					LCS lcs = new LCS();
+					String lcsQueryMatch = lcs.match(this.qryString, curLine);
+					if (!(lcsfullStr == null) && lcsQueryMatch.length() >= this.matchMin) {
+						CrHandler.printOut(lcsfullStr);
+					}
 					break;
 				case 1:
 					//Naive String
