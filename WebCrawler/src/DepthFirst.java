@@ -14,21 +14,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.net.ssl.HttpsURLConnection;
 
 public class DepthFirst {
 	private ArrayList<String> links = new ArrayList<String>();	// Store links to be visited
 	private int depthLimit, stringMatch;
 	private static int currentDepth;							// Keeps track of the current depth
-	private String qryString, urlString;
-	private String regex = ".*href=\"([^\"]*?)\".*";		// Matches for the 'href=' attribute
-	private Pattern p = Pattern.compile(regex);
+	private String qryString, urlString, fullStr = null;
 	private URLConnection con = null;
 	private InputStream ins = null;
 	private InputStreamReader isr = null;
-	private boolean containedQuery = false;					// Determines if the query has been found on the page
 	private final int CON_TIMEOUT = 4000;  		// Connection timeout (in milliseconds)
 	private double matchMin = 1;								// Sets the minimum characters that must match in the query
 	
@@ -98,70 +93,63 @@ public class DepthFirst {
 					//LCS
 					
 					// First check the site for the links and populate the links array
-					NaiveString lcsURL = new NaiveString("href=", curLine);
-					String lcsresult = lcsURL.matches();
-					String lcsfullStr = null;
-					if (lcsresult != null) {
-						Matcher m = p.matcher(lcsresult);
-						if (m.matches()) {
-							String urlStr = m.group(1);
-							lcsfullStr = CrHandler.normalizeUrl(urlStr);
-							if (!(lcsfullStr == null)) {
-								if (CrHandler.robotsSafe(lcsfullStr)) {
-									CrHandler.pw.println(lcsfullStr);
-									links.add(lcsfullStr);
-									CrHandler.addVisited(lcsfullStr);
-								}
-							}
-						}
-					}
+					fullStr = CrHandler.populateLinks(curLine);
+					if (!(fullStr == null))
+						links.add(fullStr);
 					
+					// Run String Matching
 					LCS lcs = new LCS();
 					String lcsQueryMatch = lcs.match(this.qryString, curLine);
-					if (!(lcsfullStr == null) && lcsQueryMatch.length() >= this.matchMin) {
-						CrHandler.printOut(lcsfullStr);
+					if (!(fullStr == null) && lcsQueryMatch.length() >= this.matchMin) {
+						CrHandler.printOut(fullStr);
 					}
 					break;
 				case 1:
 					//Naive String
-					
+
 					// First check the site for the links and populate the links array
-					NaiveString nsURL = new NaiveString("href=", curLine);
-					String result = nsURL.matches();
-					String fullStr = null;
-					if (result != null) {
-						Matcher m = p.matcher(result);
-						if (m.matches()) {
-							String urlStr = m.group(1);
-							fullStr = CrHandler.normalizeUrl(urlStr);
-							if (!(fullStr == null)) {
-								if (CrHandler.robotsSafe(fullStr)) {
-									CrHandler.pw.println(fullStr);
-									links.add(fullStr);
-									CrHandler.addVisited(fullStr);
-								}
-							}
-						}
-					}	
+					fullStr = CrHandler.populateLinks(curLine);
+					if (!(fullStr == null))
+						links.add(fullStr);
 					
-					// Only run string matching if the query hasn't been found on this site
-					//if (!(this.containedQuery)) {
-						// Match the query string
-						NaiveString nss = new NaiveString(this.qryString, curLine);
-						String queryMatch = nss.matches();
-						if (!(queryMatch == null) && !(fullStr == null))
-							CrHandler.printOut(fullStr);
-						//	this.containedQuery = true;
-						break;
+					// Run String Matching
+					NaiveString nss = new NaiveString(this.qryString, curLine);
+					String queryMatch = nss.matches();
+					if (!(queryMatch == null) && !(fullStr == null))
+						CrHandler.printOut(fullStr);
+					break;
 					//}
 				case 2:
 					//Rabin-Karp
+
+					// First check the site for the links and populate the links array
+					fullStr = CrHandler.populateLinks(curLine);
+					if (!(fullStr == null))
+						links.add(fullStr);
+					
+					// Run String Matching
+					
 					break;
 				case 3:
 					//Finite Automata
+
+					// First check the site for the links and populate the links array
+					fullStr = CrHandler.populateLinks(curLine);
+					if (!(fullStr == null))
+						links.add(fullStr);
+					
+					// Run String Matching
+					
 					break;
 				case 4:
 					//KMP
+
+					// First check the site for the links and populate the links array
+					fullStr = CrHandler.populateLinks(curLine);
+					if (!(fullStr == null))
+						links.add(fullStr);
+					
+					// Run String Matching
 					break;
 				default:
 					CrHandler.printOut("Incorrect String matching algorithm selected!");

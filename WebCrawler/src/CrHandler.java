@@ -28,6 +28,9 @@ public class CrHandler {
 	private static String iface;				// handles whether the crawler is in console or GUI mode
 	private static ArrayList<String> robots = new ArrayList<String>();	// Stores robots.txt information
 	private static ArrayList<String> visited = new ArrayList<String>(); // Stores links that have been visited
+	private static String regex = ".*href=\"([^\"]*?)\".*";		// Matches for the 'href=' attribute
+	private static Pattern p = Pattern.compile(regex);
+
 	
 	// Store necessary warning
 	protected static String loadInfo = "Thank you for using EpiCrawl by John Wiltberger\n\n"
@@ -282,4 +285,25 @@ public class CrHandler {
 		return result;
 	}
 
+	public static String populateLinks(String curLine) {
+		NaiveString urlMatching = new NaiveString("href=", curLine);
+		String urlResult = urlMatching.matches();
+		String urlfullStr = null;
+		if (urlResult != null) {
+			Matcher m = p.matcher(urlResult);
+			if (m.matches()) {
+				String urlStr = m.group(1);
+				urlfullStr = CrHandler.normalizeUrl(urlStr);
+				if (!(urlfullStr == null)) {
+					if (robotsSafe(urlfullStr)) {
+						pw.println(urlfullStr);
+						addVisited(urlfullStr);
+						return urlfullStr;
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
 }

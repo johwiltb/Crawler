@@ -26,6 +26,11 @@ after the domain.
 - Does not understand non-standard robots.txt extensions.
 - Probably more!
 
+Notes on the String Matching...
+Naive String matching - Obvious brute-force matching
+LCS - Matches at a floor of 60% on whole characters
+Rabin-Karp - Uses Las Vegas method, for exact accuracy to hopeful speed
+
 JRE -> JavaSE-1.7
 IDE -> Eclipse Kepler
 File list:
