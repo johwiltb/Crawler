@@ -225,9 +225,13 @@ public class EpiCrawl {
     	if (this.algSearch == 0) {
         	BFS search = new BFS(this.searchURL, this.searchText, this.algString);
         	search.search();
-        } else if (this.algSearch == 1) {
-        	new DepthFirst(this.searchURL, this.modifier, this.modifier, this.algString, this.searchText);
         	CrHandler.pw.close();
+        	search.clearLinks();
+        	resultsTxtArea.append("All Finished!");
+        } else if (this.algSearch == 1) {
+        	DepthFirst search = new DepthFirst(this.searchURL, this.modifier, this.modifier, this.algString, this.searchText);
+        	CrHandler.pw.close();
+        	search.clearLinks();
         	resultsTxtArea.append("All Finished!");
         } else {
         	resultsTxtArea.append("There was an issue in the choice of Search Algorithms");

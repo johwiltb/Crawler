@@ -306,4 +306,8 @@ public class CrHandler {
 		return null;
 	}
 	
+	public static void clearLinks() {
+		robots.clear();
+		visited.clear();
+	}
 }

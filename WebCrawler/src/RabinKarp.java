@@ -5,7 +5,8 @@
  * as inputs, and will determine if there is a match.  It will then return the full line
  * if the match exists.
  * 
- * Material taken from http://algs4.cs.princeton.edu/53substring/RabinKarp.java.html with minor modifications
+ * Material taken from http://algs4.cs.princeton.edu/53substring/RabinKarp.java.html with 
+ * minor modifications. Only runs Las Vegas style.
  */
 
 import java.math.BigInteger;
@@ -19,9 +20,6 @@ public class RabinKarp {
     private int R;           // radix
     private long RM;         // R^(M-1) % Q
 
-    public RabinKarp(int R, char[] pattern) {
-        throw new UnsupportedOperationException("Operation not supported yet");
-    }
 
     public RabinKarp(String pat) {
         this.pat = pat;      // save pattern (needed only for Las Vegas)

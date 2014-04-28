@@ -20,7 +20,7 @@ public class DepthFirst {
 	private ArrayList<String> links = new ArrayList<String>();	// Store links to be visited
 	private int depthLimit, stringMatch;
 	private static int currentDepth;							// Keeps track of the current depth
-	private String qryString, urlString, fullStr = null;
+	private String qryString, urlString;
 	private URLConnection con = null;
 	private InputStream ins = null;
 	private InputStreamReader isr = null;
@@ -93,50 +93,53 @@ public class DepthFirst {
 					//LCS
 					
 					// First check the site for the links and populate the links array
-					fullStr = CrHandler.populateLinks(curLine);
-					if (!(fullStr == null))
-						links.add(fullStr);
+					String lfullStr = CrHandler.populateLinks(curLine);
+					if (!(lfullStr == null))
+						links.add(lfullStr);
 					
 					// Run String Matching
 					LCS lcs = new LCS();
 					String lcsQueryMatch = lcs.match(this.qryString, curLine);
-					if (!(fullStr == null) && lcsQueryMatch.length() >= this.matchMin) {
-						CrHandler.printOut(fullStr);
+					if (!(lfullStr == null) && lcsQueryMatch.length() >= this.matchMin) {
+						CrHandler.printOut(lfullStr);
 					}
 					break;
 				case 1:
 					//Naive String
 
 					// First check the site for the links and populate the links array
-					fullStr = CrHandler.populateLinks(curLine);
-					if (!(fullStr == null))
-						links.add(fullStr);
+					String nfullStr = CrHandler.populateLinks(curLine);
+					if (!(nfullStr == null))
+						links.add(nfullStr);
 					
 					// Run String Matching
 					NaiveString nss = new NaiveString(this.qryString, curLine);
 					String queryMatch = nss.matches();
-					if (!(queryMatch == null) && !(fullStr == null))
-						CrHandler.printOut(fullStr);
+					if (!(queryMatch == null) && !(nfullStr == null))
+						CrHandler.printOut(nfullStr);
 					break;
 					//}
 				case 2:
 					//Rabin-Karp
 
 					// First check the site for the links and populate the links array
-					fullStr = CrHandler.populateLinks(curLine);
-					if (!(fullStr == null))
-						links.add(fullStr);
+					String rfullStr = CrHandler.populateLinks(curLine);
+					if (!(rfullStr == null))
+						links.add(rfullStr);
 					
 					// Run String Matching
-					
+					RabinKarp rk = new RabinKarp(this.qryString);
+					int found = rk.search(curLine);
+					if (found >= 0 && !(rfullStr == null))
+						CrHandler.printOut(rfullStr);
 					break;
 				case 3:
 					//Finite Automata
 
 					// First check the site for the links and populate the links array
-					fullStr = CrHandler.populateLinks(curLine);
-					if (!(fullStr == null))
-						links.add(fullStr);
+					String ffullStr = CrHandler.populateLinks(curLine);
+					if (!(ffullStr == null))
+						links.add(ffullStr);
 					
 					// Run String Matching
 					
@@ -145,9 +148,9 @@ public class DepthFirst {
 					//KMP
 
 					// First check the site for the links and populate the links array
-					fullStr = CrHandler.populateLinks(curLine);
-					if (!(fullStr == null))
-						links.add(fullStr);
+					String kfullStr = CrHandler.populateLinks(curLine);
+					if (!(kfullStr == null))
+						links.add(kfullStr);
 					
 					// Run String Matching
 					break;
@@ -172,5 +175,10 @@ public class DepthFirst {
 				currentDepth++;
 			}
 		}
+	}
+	
+	public void clearLinks() {
+		links.clear();
+		CrHandler.clearLinks();
 	}
 }

@@ -15,12 +15,14 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
 
 public class BFS {
+	private ArrayList<String> links = new ArrayList<String>();	// Store links to be visited
 	private int strMatchAlg;			// Integer representing the chosen string matching algorithm
-	private String url, qText;	// String representing the URL and query text
+	private String url, qText, curLine;	// String representing the URL and query text
 	
 	/**
 	 * Constructor for BFS.  Takes in the important information for the class
@@ -115,9 +117,9 @@ public class BFS {
 				case(2):
 					try {
 						while((tmpLine = br.readLine()) != null && this.isSearching()) {
-							RabinKarp rks = new RabinKarp(this.getqText(), tmpLine);
+							RabinKarp rks = new RabinKarp(this.getqText());
 							// for testing
-							rks.test();
+							int found = rks.search(curLine);
 							System.out.println(tmpLine);
 						}
 					} catch (MalformedURLException e) {
@@ -226,5 +228,10 @@ public class BFS {
 	 */
 	public boolean isSearching() {
 		return true;
+	}
+	
+	public void clearLinks() {
+		links.clear();
+		CrHandler.clearLinks();
 	}
 }
