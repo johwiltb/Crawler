@@ -130,8 +130,11 @@ public class DepthFirst {
 					// Run String Matching
 					RabinKarp rk = new RabinKarp(this.qryString);
 					int found = rk.search(curLine);
-					if (found >= 0 && !(rfullStr == null))
-						CrHandler.printOut(rfullStr);
+					if (found >= 0)
+						if (rk.newLink(this.urlString)) {
+							CrHandler.printOut(this.urlString);
+							rk.addLinks(this.urlString);
+						}
 					break;
 				case 3:
 					//Finite Automata

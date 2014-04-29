@@ -10,6 +10,7 @@
  */
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class RabinKarp {
@@ -19,6 +20,7 @@ public class RabinKarp {
     private long Q;          // a large prime, small enough to avoid long overflow
     private int R;           // radix
     private long RM;         // R^(M-1) % Q
+    private static ArrayList<String> seenLinks = new ArrayList<String>();
 
 
     public RabinKarp(String pat) {
@@ -53,7 +55,7 @@ public class RabinKarp {
     // check for exact match
     public int search(String txt) {
         int N = txt.length(); 
-        if (N < M) return N;
+        if (N < M) return -1;
         long txtHash = hash(txt, M); 
 
         // check for match at offset 0
@@ -81,5 +83,16 @@ public class RabinKarp {
     private static long longRandomPrime() {
         BigInteger prime = BigInteger.probablePrime(31, new Random());
         return prime.longValue();
+    }
+    
+    public void addLinks(String link) {
+    	seenLinks.add(link);
+    }
+    
+    public boolean newLink(String link) {
+    	if (seenLinks.contains(link)) {
+    		return false;
+    	}
+    	return true;
     }
 }

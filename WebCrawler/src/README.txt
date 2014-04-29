@@ -19,7 +19,6 @@ called links.
 run 'java ConsoleCrawler'.  To run the GUI version, compile and run 
 'java EpiCrawl'
 
-*** FOR PROJECT 1, ONLY DEPTH LIMITED SEARCHING AND NAIVE STRING MATCHING WORKS ***
 Known Issues/Limitations:
 - Does not correctly crawl URLs with changing subdomains.  Strictly crawls URLs
 after the domain.
@@ -30,6 +29,10 @@ Notes on the String Matching...
 Naive String matching - Obvious brute-force matching
 LCS - Matches at a floor of 60% on whole characters
 Rabin-Karp - Uses Las Vegas method, for exact accuracy to hopeful speed
+
+**CURRENTLY WORKING AS FOLLOWS**
+- Only DLS searching
+- LCS, Naive String, and Rabin-Karp
 
 JRE -> JavaSE-1.7
 IDE -> Eclipse Kepler

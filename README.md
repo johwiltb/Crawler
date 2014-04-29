@@ -19,12 +19,15 @@ called links.
 run 'java ConsoleCrawler'.  To run the GUI version, compile and run 
 'java EpiCrawl'
 
-*** FOR PROJECT 1, ONLY DEPTH LIMITED SEARCHING AND NAIVE STRING MATCHING WORKS ***
 Known Issues/Limitations:
 - Does not correctly crawl URLs with changing subdomains.  Strictly crawls URLs
 after the domain.
 - Does not understand non-standard robots.txt extensions.
 - Probably more!
+
+**CURRENTLY WORKING**
+- Only DLS searching
+- LCS, Naive String, and Rabin-Karp
 
 JRE -> JavaSE-1.7
 IDE -> Eclipse Kepler
