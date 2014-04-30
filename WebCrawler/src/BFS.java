@@ -9,167 +9,197 @@
  */
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.net.ssl.HttpsURLConnection;
 
 public class BFS {
-	private ArrayList<String> links = new ArrayList<String>();	// Store links to be visited
+	private static Queue<String> links = new LinkedList<String>();	// Store links to be visited
 	private int strMatchAlg;			// Integer representing the chosen string matching algorithm
-	private String url, qText, curLine;	// String representing the URL and query text
-	
+	private String url, qText;	// String representing the URL and query text
+	private URLConnection con = null;
+	private InputStream ins = null;
+	private InputStreamReader isr = null;
+	private final int CON_TIMEOUT = 4000;  		// Connection timeout (in milliseconds)
+	private static int visitedLinks = 0;		// Store number of links visited
+	private static int maxLinksVisit = 0;		// Maximum visited links
+	private double matchMin = 1;				// Sets the minimum characters that must match in the query
+
+
 	/**
 	 * Constructor for BFS.  Takes in the important information for the class
 	 * @param url String representation of the URL
 	 * @param qText String representation of the query text
 	 * @param strMatchChoice Integer for the string matching choice
 	 */
-	public BFS(String url, String qText, int strMatchChoice) {
+	public BFS(String url, int maxPages, String qText, int strMatchChoice) {
 		// Any constructor stuff goes here
-		
-		// For Test Purposes
 		this.setqText(qText);
+		maxLinksVisit = maxPages;
 		this.setUrl(url);
 		this.setStrMatchAlg(strMatchChoice);
-	}
-	
-	/**
-	 * Searching method, will be the system that initiates the tree building, as well as dives toward
-	 * the string matching algorithm, and will handle the result info.
-	 */
-	public void search() {
-		if (this.isSearching()) {
-			URLConnection con = null;
-			InputStream ins = null;
-			InputStreamReader isr = null;
-			try {
-				URL urlSearch = new URL(getUrl());
-				if (getUrl().matches("^https")) {
-					con = (HttpsURLConnection)urlSearch.openConnection();
-				} else {
-					con = urlSearch.openConnection();
-				}
-				// Hehe, look like a real web browser
-				con.setRequestProperty("User-Agent", "EpiCrawl v1.0");
-				ins = con.getInputStream();
-			    isr = new InputStreamReader(ins);
-			} catch (MalformedURLException e1) {
-				System.out.println("Unable to connect to URL!");
-				e1.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("Unable to open https connection");
-				e.printStackTrace();
+		this.matchMin = Math.floor(getqText().length() * 0.6);
+
+		// Attempt to open the connection
+		try {
+			URL urlSearch = new URL(this.url);
+			if (this.url.matches("^https")) {
+				con = (HttpsURLConnection)urlSearch.openConnection();
+			} else {
+				con = urlSearch.openConnection();
 			}
-	    	BufferedReader br = null;
-			br = new BufferedReader(isr);
-	    	String tmpLine = " ";
-			// Pull the first domain, and search content.
-			
-			// Use string matching algorithm here to match query text
-			switch(this.getStrMatchAlg()) {
-			
-				// Longest Common Sequence
-				case(0):
-					try {
-						while((tmpLine = br.readLine()) != null && this.isSearching()) {
-							LCS lcs = new LCS();
-							// for testing
-							String pat;
-							pat = lcs.match(this.getqText(), tmpLine);
-							//pat = nss.giveString();
-							System.out.println(pat);
-						}
-					} catch (MalformedURLException e) {
-						System.out.println("Unable to open URL!");
-						System.exit(1);
-					} catch (IOException e) {
-						
-					}
-					break;
+			con.setConnectTimeout(CON_TIMEOUT);
+			con.setRequestProperty("User-Agent", "EpiCrawl v1.0");
+			try {
+				ins = con.getInputStream();
+			} catch (IOException e) {
+				return;
+			}
+		} catch (MalformedURLException e) {
+			CrHandler.printOut("Unable to connect to URL!");
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			return;
+		} catch (IOException e) {
+			CrHandler.printOut("Unable to open connection!");
+			e.printStackTrace();
+		}
+		
+		// Begin reading from the site
+	    this.isr = new InputStreamReader(ins);
+		BufferedReader br = new BufferedReader(this.isr);
+		String curLine = null;
+		try {
+			curLine = br.readLine();
+		} catch (IOException e) {
+			CrHandler.printOut("Cannot read from site!");
+			System.exit(1);
+		}
+		
+		// populate robots.txt info
+		if (visitedLinks == 0) {
+			CrHandler.buildRobots();
+		}
+		// check to make sure the depth hasn't hit its minimum
+		if ( visitedLinks < maxLinksVisit )
+		{
+			// string matching here
+			while(curLine != null) {
+				switch(getStrMatchAlg()) {
+				case 0:
+					//LCS
 					
-				// Naive String Matching
-				case(1):
-					try {
-						tmpLine = br.readLine();
-						while(tmpLine != null && this.isSearching()) {
-							NaiveString nss = new NaiveString(this.getqText(), tmpLine);
-							String pat;
-							pat = nss.matches();
-							if (pat != null)
-								System.out.println(pat);
-							tmpLine = br.readLine();
+					// First check the site for the links and populate the links array
+					String lfullStr = CrHandler.populateLinks(curLine);
+					if (!(lfullStr == null)) {
+						if ( visitedLinks < maxLinksVisit ) {
+							links.add(lfullStr);
+							visitedLinks++;
 						}
-					} catch (MalformedURLException e) {
-						System.out.println("Unable to open URL!");
-						System.exit(1);
-					} catch (IOException e) {
-						
+					}
+					// Run String Matching
+					LCS lcs = new LCS();
+					String lcsQueryMatch = lcs.match(getqText(), curLine);
+					if (!(lfullStr == null) && lcsQueryMatch.length() >= this.matchMin) {
+						CrHandler.printOut(lfullStr);
 					}
 					break;
+				case 1:
+					//Naive String
+
+					// First check the site for the links and populate the links array
+					String nfullStr = CrHandler.populateLinks(curLine);
+					if (!(nfullStr == null)) {
+						if ( visitedLinks < maxLinksVisit ) {
+							links.add(nfullStr);
+							visitedLinks++;
+						}
+					}
+					// Run String Matching
+					NaiveString nss = new NaiveString(getqText(), curLine);
+					String queryMatch = nss.matches();
+					if (!(queryMatch == null) && !(nfullStr == null))
+						CrHandler.printOut(nfullStr);
+					break;
+					//}
+				case 2:
+					//Rabin-Karp
+
+					// First check the site for the links and populate the links array
+					String rfullStr = CrHandler.populateLinks(curLine);
+					if (!(rfullStr == null)) {
+						if ( visitedLinks < maxLinksVisit ) {
+							links.add(rfullStr);
+							visitedLinks++;
+						}
+					}
+					// Run String Matching
+					RabinKarp rk = new RabinKarp(getqText());
+					int found = rk.search(curLine);
+					if (found >= 0)
+						if (rk.newLink(this.getUrl())) {
+							CrHandler.printOut(this.getUrl());
+							rk.addLinks(this.getUrl());
+						}
+					break;
+				case 3:
+					//Finite Automata
+
+					// First check the site for the links and populate the links array
+					String ffullStr = CrHandler.populateLinks(curLine);
+					if (!(ffullStr == null)) {
+						if ( visitedLinks < maxLinksVisit ) {
+							links.add(ffullStr);
+							visitedLinks++;
+						}
+					}
+					// Run String Matching
 					
-				// Rabin-Karp String Matching
-				case(2):
-					try {
-						while((tmpLine = br.readLine()) != null && this.isSearching()) {
-							RabinKarp rks = new RabinKarp(this.getqText());
-							// for testing
-							int found = rks.search(curLine);
-							System.out.println(tmpLine);
-						}
-					} catch (MalformedURLException e) {
-						System.out.println("Unable to open URL!");
-						System.exit(1);
-					} catch (IOException e) {
-						
-					}
 					break;
+				case 4:
+					//KMP
+
+					// First check the site for the links and populate the links array
+					String kfullStr = CrHandler.populateLinks(curLine);
+					if (!(kfullStr == null)) {
+						if ( visitedLinks < maxLinksVisit ) {
+							links.add(kfullStr);
+							visitedLinks++;
+						}
+					}
+					// Run String Matching
 					
-				// Finite Automata String Matching
-				case(3):
-					try {
-						while((tmpLine = br.readLine()) != null && this.isSearching()) {
-							FiniteAutomata fas = new FiniteAutomata(this.getqText(), tmpLine);
-							// for testing
-							fas.test();
-						}
-					} catch (MalformedURLException e) {
-						System.out.println("Unable to open URL!");
-						System.exit(1);
-					} catch (IOException e) {
-						
-					}
 					break;
-				
-				// Knuth-Morris-Pratt String Matching
-				case(4):
-					try {
-						while((tmpLine = br.readLine()) != null && this.isSearching()) {
-							KMP kmp = new KMP(this.getqText(), tmpLine);
-							// for testing
-							kmp.test();
-						}
-					} catch (MalformedURLException e) {
-						System.out.println("Unable to open URL!");
-						System.exit(1);
-					} catch (IOException e) {
-						
-					}
-					break;
-				
-				// Default Case
 				default:
-					System.out.println("Invalid String Matching Algorithm selected!");
+					CrHandler.printOut("Incorrect String matching algorithm selected!");
 					System.exit(1);
+					break;
+				}
+				
+				// Read the next line after the match
+				try {
+					curLine = br.readLine();
+				} catch (IOException e) {
+					CrHandler.printOut("Cannot read from site!");
+					System.exit(1);
+				}
+			}
+			
+			// Search through the links that were populated (recursive part of the class)
+			while (!(links.isEmpty())) {
+				new BFS(links.remove(), maxLinksVisit, qText, getStrMatchAlg());
 			}
 		}
 	}
-
+	
 	/**
 	 * Accessor for the string matching algorithm
 	 * @return integer representing chosen string matching algorithm

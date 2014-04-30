@@ -102,8 +102,7 @@ public class ConsoleCrawler {
 				new DepthFirst(getUrl(), optionalNum, optionalNum, getStringType() - 1, queryText);
 				break;
 			case 2:
-				BFS bfs = new BFS(urlText, queryText, (stringType-1));
-				bfs.search();
+				new BFS(getUrl(), optionalNum, queryText, (stringType-1));
 				break;
 			default:
 				break;

@@ -223,8 +223,7 @@ public class EpiCrawl {
     	
     	// Sets up the search algorithm
     	if (this.algSearch == 0) {
-        	BFS search = new BFS(this.searchURL, this.searchText, this.algString);
-        	search.search();
+        	BFS search = new BFS(this.searchURL, this.modifier, this.searchText, this.algString);
         	CrHandler.pw.close();
         	search.clearLinks();
         	resultsTxtArea.append("All Finished!");

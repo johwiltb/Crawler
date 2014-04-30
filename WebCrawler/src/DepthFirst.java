@@ -25,7 +25,7 @@ public class DepthFirst {
 	private InputStream ins = null;
 	private InputStreamReader isr = null;
 	private final int CON_TIMEOUT = 4000;  		// Connection timeout (in milliseconds)
-	private double matchMin = 1;								// Sets the minimum characters that must match in the query
+	private double matchMin = 1;				// Sets the minimum characters that must match in the query
 	
 	/**
 	 * Constructor for Depth First class (this is recursive)
