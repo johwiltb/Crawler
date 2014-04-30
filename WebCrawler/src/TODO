@@ -1,4 +1,4 @@
 - Get robots.txt from an inputted URL that is not top level (i.e. http://www.foo.com/bar/foobar)
 - Add checking for User-Agent in robots.txt
-- Fix depthfirst use of already visited boolean variable
 - Get subdomain switching to work
+- Commenting! (probably always on TODO)

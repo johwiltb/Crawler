@@ -176,7 +176,14 @@ public class BFS {
 						}
 					}
 					// Run String Matching
-					
+					KMP kmp = new KMP(getqText());
+					int kfound = kmp.search(curLine);
+					if (kfound >= 0) {
+						if (kmp.newLink(this.getUrl())) {
+							CrHandler.printOut(this.getUrl());
+							kmp.addLinks(this.getUrl());
+						}
+					}
 					break;
 				default:
 					CrHandler.printOut("Incorrect String matching algorithm selected!");

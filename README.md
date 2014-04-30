@@ -26,8 +26,8 @@ after the domain.
 - Probably more!
 
 **CURRENTLY WORKING**
-- Only DLS searching
-- LCS, Naive String, and Rabin-Karp
+- Finite Automata not working
+- GUI is...buggy...
 
 JRE -> JavaSE-1.7
 IDE -> Eclipse Kepler

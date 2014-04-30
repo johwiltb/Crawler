@@ -129,8 +129,8 @@ public class DepthFirst {
 					
 					// Run String Matching
 					RabinKarp rk = new RabinKarp(this.qryString);
-					int found = rk.search(curLine);
-					if (found >= 0)
+					int rfound = rk.search(curLine);
+					if (rfound >= 0)
 						if (rk.newLink(this.urlString)) {
 							CrHandler.printOut(this.urlString);
 							rk.addLinks(this.urlString);
@@ -156,6 +156,14 @@ public class DepthFirst {
 						links.add(kfullStr);
 					
 					// Run String Matching
+					KMP kmp = new KMP(this.qryString);
+					int kfound = kmp.search(curLine);
+					if (kfound >= 0) {
+						if (kmp.newLink(this.urlString)) {
+							CrHandler.printOut(this.urlString);
+							kmp.addLinks(this.urlString);
+						}
+					}
 					break;
 				default:
 					CrHandler.printOut("Incorrect String matching algorithm selected!");
