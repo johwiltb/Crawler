@@ -41,7 +41,9 @@ public class DepthFirst {
 		this.stringMatch = strMatch;
 		this.qryString = query;
 		this.urlString = url;
-		this.matchMin = Math.floor(this.qryString.length() * 0.6);
+		
+		// Sets the match for LCS to be at least 60% of the query size
+		this.matchMin = Math.ceil(this.qryString.length() * 0.6);
 		
 		// Attempt to open the connection
 		try {
@@ -177,6 +179,9 @@ public class DepthFirst {
 		}
 	}
 	
+	/**
+	 * Clears out the cache of links stored in the links array
+	 */
 	public void clearLinks() {
 		links.clear();
 		CrHandler.clearLinks();

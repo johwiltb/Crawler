@@ -8,14 +8,15 @@
 
 public class LCS {
 	private String matchStr = "";
-	public LCS() {
-		
-	}
 	
-	public void test() {
-		System.out.println("Starting Longest Common Sequence");
-	}
+	public LCS() {	}
 	
+	/**
+	 * Matches the string with the query
+	 * @param query Query the user is searching for
+	 * @param fullLine Text for the user to search for
+	 * @return The longest sequence that matches from the query string
+	 */
 	public String match(String query, String fullLine){
 	    int qTextLen = query.length();
 	    int fLineLen = fullLine.length();

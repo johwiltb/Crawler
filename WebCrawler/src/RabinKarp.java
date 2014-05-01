@@ -23,6 +23,10 @@ public class RabinKarp {
     private static ArrayList<String> seenLinks = new ArrayList<String>();
 
 
+    /**
+     * Constructor for building RabinKarp search, builds hash of query
+     * @param pat Query that is to be searched for
+     */
     public RabinKarp(String pat) {
         this.pat = pat;      // save pattern (needed only for Las Vegas)
         R = 256;
@@ -52,7 +56,11 @@ public class RabinKarp {
         return true;
     }
 
-    // check for exact match
+    /**
+     * Checks for match (Las Vegas Style - Exact Match)
+     * @param txt String of characters to search in
+     * @return offset of match, or -1 if no match
+     */
     public int search(String txt) {
         int N = txt.length(); 
         if (N < M) return -1;
@@ -85,10 +93,19 @@ public class RabinKarp {
         return prime.longValue();
     }
     
+    /**
+     * Add visited links to the 'seenLinks' array
+     * @param link Link that has been visited
+     */
     public void addLinks(String link) {
     	seenLinks.add(link);
     }
     
+    /**
+     * Checks to see if the link has been visited
+     * @param link Link to check if we've been there
+     * @return True/False of whether link has been visited
+     */
     public boolean newLink(String link) {
     	if (seenLinks.contains(link)) {
     		return false;

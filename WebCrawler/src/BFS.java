@@ -46,7 +46,9 @@ public class BFS {
 		maxLinksVisit = maxPages;
 		this.setUrl(url);
 		this.setStrMatchAlg(strMatchChoice);
-		this.matchMin = Math.floor(getqText().length() * 0.6);
+		
+		// Sets the match for LCS to be at least 60% of the query size
+		this.matchMin = Math.ceil(getqText().length() * 0.6);
 
 		// Attempt to open the connection
 		try {
@@ -187,6 +189,8 @@ public class BFS {
 			}
 			
 			// Search through the links that were populated (recursive part of the class)
+			// Adds them to the a queue based on Linked Lists, inserting at the end and pulling
+			// from the beginning.
 			while (!(links.isEmpty())) {
 				new BFS(links.remove(), maxLinksVisit, qText, getStrMatchAlg());
 			}
@@ -253,6 +257,9 @@ public class BFS {
 		return true;
 	}
 	
+	/**
+	 * Clears the links in the links array
+	 */
 	public void clearLinks() {
 		links.clear();
 		CrHandler.clearLinks();

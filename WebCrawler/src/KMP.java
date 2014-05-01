@@ -18,7 +18,10 @@ public class KMP {
     private static ArrayList<String> seenLinks = new ArrayList<String>();
 
 
-    // create the DFA from a String
+    /**
+     * Constructor for class and creates the needed pattern matching automoton
+     * @param pat Pattern that you are searching for
+     */
     public KMP(String pat) {
         this.R = 256;
         this.pat = pat;
@@ -35,7 +38,11 @@ public class KMP {
         } 
     } 
 
-    // return offset of first match; N if no match
+    /**
+     * Searches the inputted text for the pattern created previously
+     * @param txt Search string to query through
+     * @return location of match, or -1 if no match
+     */
     public int search(String txt) {
 
         // simulate operation of DFA on text
@@ -50,10 +57,19 @@ public class KMP {
         return -1;                    // not found
     }
     
+    /**
+     * Add visited links to the 'seenLinks' array
+     * @param link Link that has been visited
+     */
     public void addLinks(String link) {
     	seenLinks.add(link);
     }
     
+    /**
+     * Checks to see if the link has been visited
+     * @param link Link to check if we've been there
+     * @return True/False of whether link has been visited
+     */
     public boolean newLink(String link) {
     	if (seenLinks.contains(link)) {
     		return false;
