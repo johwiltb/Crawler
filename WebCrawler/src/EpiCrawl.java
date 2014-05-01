@@ -33,7 +33,7 @@ public class EpiCrawl {
 	
 	// Initiate options for searches and string matching
     private String[] searchOpts = {"Breadth First Search (BFS)", "Depth Limited Search (DLS)"};
-    private String[] stringMatches = {"Longest Common Sequence", "Naive String Matching Algorithm", "Rabin-Karp Algorithm", "Finite Automata Algorithm", "KMP Algorithm"};
+    private String[] stringMatches = {"Longest Common Sequence", "Naive String Matching Algorithm", "Rabin-Karp Algorithm", "KMP Algorithm"};
     
 	
 	// Set both the main frame and the skeleton panels

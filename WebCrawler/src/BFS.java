@@ -151,20 +151,6 @@ public class BFS {
 						}
 					break;
 				case 3:
-					//Finite Automata
-
-					// First check the site for the links and populate the links array
-					String ffullStr = CrHandler.populateLinks(curLine);
-					if (!(ffullStr == null)) {
-						if ( visitedLinks < maxLinksVisit ) {
-							links.add(ffullStr);
-							visitedLinks++;
-						}
-					}
-					// Run String Matching
-					
-					break;
-				case 4:
 					//KMP
 
 					// First check the site for the links and populate the links array
