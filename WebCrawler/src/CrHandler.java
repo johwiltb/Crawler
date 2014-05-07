@@ -30,6 +30,7 @@ public class CrHandler {
 	private static ArrayList<String> visited = new ArrayList<String>(); // Stores links that have been visited
 	private static String regex = ".*href=\"([^\"]*?)\".*";		// Matches for the 'href=' attribute
 	private static Pattern p = Pattern.compile(regex);
+	protected static long timePassed;
 
 	
 	// Store necessary warning

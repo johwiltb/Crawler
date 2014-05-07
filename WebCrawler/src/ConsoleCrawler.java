@@ -95,6 +95,7 @@ public class ConsoleCrawler {
 			System.exit(1);
 		}
 		
+		CrHandler.timePassed = System.currentTimeMillis();
 		// Begins search based off of search choice
 		switch(searchType) {
 			case 1:
@@ -108,7 +109,10 @@ public class ConsoleCrawler {
 				break;
 		}
 		CrHandler.pw.close();
-		System.out.println("\nThank you for using this!");
+		CrHandler.timePassed = System.currentTimeMillis() - CrHandler.timePassed;
+		double lapsedTime = CrHandler.timePassed / 1000.0;
+		CrHandler.printOut("Time taken: " + lapsedTime + " seconds");
+		CrHandler.printOut("\nThank you for using this!");
 	}
 
 	/**
